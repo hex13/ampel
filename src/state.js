@@ -38,4 +38,12 @@ export class State {
 	then(handler) {
 		this.once(handler);
 	}
+	map(handler) {
+		const mapped = new State(this.get());
+		mapped.source = this;
+		this.on(v => {
+			mapped.set(handler(v));
+		});
+		return mapped;
+	}
 }

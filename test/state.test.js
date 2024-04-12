@@ -125,4 +125,24 @@ describe('State', () => {
 		]);
 	});
 
+	it('state should be mappable', async () => {
+		const initial = 10;
+		const state = new State(initial);
+		const mapped = state.map(x => x + 100);
+		const { first, events } = createHandlers();
+
+		assert.ok(mapped instanceof State);
+		assert.strictEqual(mapped.source, state);
+		assert.strictEqual(mapped.get(), initial);
+		mapped.on(first);
+
+		state.set(123);
+		state.set(456);
+
+		assert.deepStrictEqual(events, [
+			['first', 223],
+			['first', 556],
+		]);
+	});
+
 });
