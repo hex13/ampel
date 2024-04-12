@@ -22,11 +22,18 @@ function createHandlers() {
 }
 
 describe('State', () => {
-	it('after creation state.get() returns initial value and has metadata', () => {
-		const meta = {x: 'bzium'};
-		const state = new State(122, meta);
+	it('after creation state.get() returns initial value', () => {
+		const state = new State(122);
 		assert.strictEqual(state.get(), 122);
-		assert.strictEqual(state.meta(), meta);
+	});
+	it('after creation has metadata', () => {
+		const meta = {x: 'bzium'};
+		const emptyMeta = {mapped: []};
+		assert.deepStrictEqual(new State(122).meta(), emptyMeta);
+		assert.deepStrictEqual(new State(122, meta).meta(), {
+			...emptyMeta,
+			...meta,
+		});
 	});
 	it('it should be possible to .set and .get value ', () => {
 		checkSetGet(new State(122), 439);
@@ -130,11 +137,18 @@ describe('State', () => {
 	it('state should be mappable', async () => {
 		const initial = 10;
 		const state = new State(initial);
-		const mapped = state.map(x => x + 100);
+		const mapped = state.map(x => x + 100, {name: 'plus100'});
 		const { first, events } = createHandlers();
 
 		assert.ok(mapped instanceof State);
-		assert.strictEqual(mapped.source, state);
+
+		assert.strictEqual(mapped.meta().source, state);
+		assert.strictEqual(mapped.meta().name, 'plus100');
+
+		const metaMapped = state.meta().mapped;
+		assert.strictEqual(metaMapped.length, 1);
+		assert.strictEqual(metaMapped[0], mapped);
+
 		assert.strictEqual(mapped.get(), initial);
 		mapped.on(first);
 

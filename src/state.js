@@ -11,9 +11,12 @@ export class State {
 		});
 		this.#listeners = this.#listeners.filter(l => !l.once);
 	}
-	constructor(initial, meta) {
+	constructor(initial, meta = {}) {
 		this.#data = initial;
-		this.#meta = meta;
+		this.#meta = {
+			mapped: [],
+			...meta,
+		};
 	}
 	meta() {
 		return this.#meta;
@@ -45,12 +48,12 @@ export class State {
 	then(handler) {
 		this.once(handler);
 	}
-	map(handler) {
-		const mapped = new State(this.get());
-		mapped.source = this;
+	map(handler, meta = {}) {
+		const mapped = new State(this.get(), {source: this, ...meta});
 		this.on(v => {
 			mapped.set(handler(v));
 		});
+		this.#meta.mapped.push(mapped);
 		return mapped;
 	}
 }
