@@ -144,6 +144,7 @@ describe('State', () => {
 
 		assert.strictEqual(mapped.meta().source, state);
 		assert.strictEqual(mapped.meta().name, 'plus100');
+		assert.strictEqual(mapped.meta().kind, 'map');
 
 		const metaMapped = state.meta().mapped;
 		assert.strictEqual(metaMapped.length, 1);
