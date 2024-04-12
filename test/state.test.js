@@ -145,4 +145,15 @@ describe('State', () => {
 		]);
 	});
 
+	it('metadata for listeners', async () => {
+		const initial = 10;
+		const state = new State(initial);
+		const { first, second } = createHandlers();
+
+		state.on(first, {kotek: 'wlazł'});
+		state.once(second, {kotek: 'na płotek'});
+		assert.strictEqual(state.meta(first).kotek, 'wlazł');
+		assert.strictEqual(state.meta(second).kotek, 'na płotek');
+	});
+
 });

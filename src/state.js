@@ -20,14 +20,16 @@ export class State {
 		this.#data = v;
 		this.#invokeListeners();
 	}
-	on(handler) {
-		this.#listeners.push(createListener(handler));
+	on(handler, meta = {}) {
+		const listener = createListener(handler);
+		Object.assign(listener, meta);
+		this.#listeners.push(listener);
 	}
-	once(handler) {
-		this.#listeners.push({
-			...createListener(handler),
-			once: true,
-		});
+	once(handler, meta = {}) {
+		this.on(handler, {...meta, once: true});
+	}
+	meta(handler) {
+		return this.#listeners.find(l => getHandler(l) === handler);
 	}
 	off(handler) {
 		const idx = this.#listeners.findIndex(l => getHandler(l) === handler);
