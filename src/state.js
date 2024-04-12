@@ -3,6 +3,7 @@ const createListener = handler => ({ handler });
 
 export class State {
 	#data;
+	#meta;
 	#listeners = [];
 	#invokeListeners() {
 		this.#listeners.forEach(listener => {
@@ -10,8 +11,12 @@ export class State {
 		});
 		this.#listeners = this.#listeners.filter(l => !l.once);
 	}
-	constructor(initial) {
+	constructor(initial, meta) {
 		this.#data = initial;
+		this.#meta = meta;
+	}
+	meta() {
+		return this.#meta;
 	}
 	get() {
 		return this.#data;
@@ -28,7 +33,7 @@ export class State {
 	once(handler, meta = {}) {
 		this.on(handler, {...meta, once: true});
 	}
-	meta(handler) {
+	listener(handler) {
 		return this.#listeners.find(l => getHandler(l) === handler);
 	}
 	off(handler) {

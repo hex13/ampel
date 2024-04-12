@@ -22,9 +22,11 @@ function createHandlers() {
 }
 
 describe('State', () => {
-	it('after creation state.get() returns initial value ', () => {
-		const state = new State(122);
+	it('after creation state.get() returns initial value and has metadata', () => {
+		const meta = {x: 'bzium'};
+		const state = new State(122, meta);
 		assert.strictEqual(state.get(), 122);
+		assert.strictEqual(state.meta(), meta);
 	});
 	it('it should be possible to .set and .get value ', () => {
 		checkSetGet(new State(122), 439);
@@ -152,8 +154,8 @@ describe('State', () => {
 
 		state.on(first, {kotek: 'wlazł'});
 		state.once(second, {kotek: 'na płotek'});
-		assert.strictEqual(state.meta(first).kotek, 'wlazł');
-		assert.strictEqual(state.meta(second).kotek, 'na płotek');
+		assert.strictEqual(state.listener(first).kotek, 'wlazł');
+		assert.strictEqual(state.listener(second).kotek, 'na płotek');
 	});
 
 });
