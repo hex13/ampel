@@ -1,10 +1,10 @@
 import * as assert from 'node:assert';
-import { State } from '../src/state.js';
+import { State, get } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
 	state.set(nv);
-	assert.strictEqual(state.get(), nv);
+	assert.strictEqual(get(state), nv);
 	assert.deepStrictEqual(nv, nv_copy);
 }
 
@@ -22,9 +22,9 @@ function createHandlers() {
 }
 
 describe('State', () => {
-	it('after creation state.get() returns initial value', () => {
+	it('after creation get(state) returns initial value', () => {
 		const state = new State(122);
-		assert.strictEqual(state.get(), 122);
+		assert.strictEqual(get(state), 122);
 	});
 	it('after creation has metadata', () => {
 		const meta = {x: 'bzium'};
@@ -35,12 +35,12 @@ describe('State', () => {
 			...meta,
 		});
 	});
-	it('it should be possible to .set and .get value ', () => {
+	it('it should be possible to .set and get value ', () => {
 		checkSetGet(new State(122), 439);
 		checkSetGet(new State(122), {a: 2});
 		checkSetGet(new State(122), [10, 20, 30]);
 	});
-	it('it should be possible to .set and .get value multiple times', () => {
+	it('it should be possible to .set and get value multiple times', () => {
 		const state = new State(10);
 		checkSetGet(state, 439);
 		checkSetGet(state, {a: 2});
@@ -150,7 +150,7 @@ describe('State', () => {
 		assert.strictEqual(metaMapped.length, 1);
 		assert.strictEqual(metaMapped[0], mapped);
 
-		assert.strictEqual(mapped.get(), initial);
+		assert.strictEqual(get(mapped), initial);
 		mapped.on(first);
 
 		state.set(123);

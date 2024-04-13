@@ -67,4 +67,10 @@ export class State {
 		return mapped;
 	}
 }
-// 62
+
+export function get(state) {
+	if (state instanceof State) {
+		return state.get();
+	}
+	throw new Error(`cannot get from ${String(state)}`);
+}
