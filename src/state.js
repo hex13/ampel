@@ -88,3 +88,10 @@ export function on(state, handler, metadata) {
 	}
 	throw new Error(`cannot subscribe to ${String(state)}`);
 }
+
+export function off(state, handler) {
+	if (state instanceof State) {
+		return state.off(handler);
+	}
+	throw new Error(`cannot unsubscribe from ${String(state)}`);
+}

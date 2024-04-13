@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set, on } from '../src/state.js';
+import { State, get, set, on, off } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -64,16 +64,16 @@ describe('State', () => {
 		]);
 	});
 
-	it('it should be possible to .off and .on listeners', () => {
+	it('it should be possible to off and on listeners', () => {
 		const state = new State(10);
 		const { first, second, events } = createHandlers();
 
 		on(state, first);
 		on(state, second);
-		state.off(second);
+		off(state, second);
 		set(state, 123);
 
-		state.off(first);
+		off(state, first);
 		set(state, 456);
 
 		on(state, second);
@@ -155,7 +155,7 @@ describe('State', () => {
 
 		set(state, 123);
 		set(state, 456);
-		state.off(mapped);
+		off(state, mapped);
 		set(state, 777);
 
 		assert.deepStrictEqual(events, [
