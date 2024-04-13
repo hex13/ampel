@@ -74,3 +74,10 @@ export function get(state) {
 	}
 	throw new Error(`cannot get from ${String(state)}`);
 }
+
+export function set(state, value) {
+	if (state instanceof State) {
+		return state.set(value);
+	}
+	throw new Error(`cannot set ${String(state)}`);
+}

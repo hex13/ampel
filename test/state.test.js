@@ -1,9 +1,9 @@
 import * as assert from 'node:assert';
-import { State, get } from '../src/state.js';
+import { State, get, set } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
-	state.set(nv);
+	set(state, nv);
 	assert.strictEqual(get(state), nv);
 	assert.deepStrictEqual(nv, nv_copy);
 }
@@ -35,12 +35,12 @@ describe('State', () => {
 			...meta,
 		});
 	});
-	it('it should be possible to .set and get value ', () => {
+	it('it should be possible to set and get value ', () => {
 		checkSetGet(new State(122), 439);
 		checkSetGet(new State(122), {a: 2});
 		checkSetGet(new State(122), [10, 20, 30]);
 	});
-	it('it should be possible to .set and get value multiple times', () => {
+	it('it should be possible to set and get value multiple times', () => {
 		const state = new State(10);
 		checkSetGet(state, 439);
 		checkSetGet(state, {a: 2});
@@ -53,8 +53,8 @@ describe('State', () => {
 		state.on(first);
 		state.on(second);
 
-		state.set(123);
-		state.set(456);
+		set(state, 123);
+		set(state, 456);
 
 		assert.deepStrictEqual(events, [
 			['first', 123],
@@ -71,13 +71,13 @@ describe('State', () => {
 		state.on(first);
 		state.on(second);
 		state.off(second);
-		state.set(123);
+		set(state, 123);
 
 		state.off(first);
-		state.set(456);
+		set(state, 456);
 
 		state.on(second);
-		state.set(789);
+		set(state, 789);
 
 		assert.deepStrictEqual(events, [
 			['first', 123],
@@ -90,9 +90,9 @@ describe('State', () => {
 		const { first, second, events } = createHandlers();
 
 		state.once(first);
-		state.set(123);
-		state.set(456);
-		state.set(789);
+		set(state, 123);
+		set(state, 456);
+		set(state, 789);
 
 		assert.deepStrictEqual(events, [
 			['first', 123],
@@ -104,8 +104,8 @@ describe('State', () => {
 		const { first, events } = createHandlers();
 
 		state.then(first);
-		state.set(1000);
-		state.set(1001);
+		set(state, 1000);
+		set(state, 1001);
 
 		return Promise.resolve().then(() => {
 			assert.deepStrictEqual(events, [
@@ -124,8 +124,8 @@ describe('State', () => {
 
 		await Promise.resolve();
 
-		state.set(1000);
-		state.set(1001);
+		set(state, 1000);
+		set(state, 1001);
 
 		await Promise.resolve();
 
@@ -153,10 +153,10 @@ describe('State', () => {
 		assert.strictEqual(get(mapped), initial);
 		mapped.on(first);
 
-		state.set(123);
-		state.set(456);
+		set(state, 123);
+		set(state, 456);
 		state.off(mapped);
-		state.set(777);
+		set(state, 777);
 
 		assert.deepStrictEqual(events, [
 			['first', 223],
