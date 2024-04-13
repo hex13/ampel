@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set, on, off } from '../src/state.js';
+import { State, get, set, on, off, once } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -85,11 +85,11 @@ describe('State', () => {
 		]);
 	});
 
-	it('it should be possible to set .once listener', () => {
+	it('it should be possible to set once listener', () => {
 		const state = new State(10);
 		const { first, second, events } = createHandlers();
 
-		state.once(first);
+		once(state, first);
 		set(state, 123);
 		set(state, 456);
 		set(state, 789);
@@ -170,7 +170,7 @@ describe('State', () => {
 		const { first, second } = createHandlers();
 
 		on(state, first, {kotek: 'wlazł'});
-		state.once(second, {kotek: 'na płotek'});
+		once(state, second, {kotek: 'na płotek'});
 		assert.strictEqual(state.listener(first).kotek, 'wlazł');
 		assert.strictEqual(state.listener(second).kotek, 'na płotek');
 	});
