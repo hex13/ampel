@@ -143,7 +143,6 @@ describe('State', () => {
 		assert.ok(mapped instanceof State);
 
 		assert.strictEqual(mapped.meta().source, state);
-		assert.strictEqual(typeof mapped.meta().mapper, 'function');
 		assert.strictEqual(mapped.meta().name, 'plus100');
 		assert.strictEqual(mapped.meta().kind, 'map');
 
@@ -156,6 +155,8 @@ describe('State', () => {
 
 		state.set(123);
 		state.set(456);
+		state.off(mapped);
+		state.set(777);
 
 		assert.deepStrictEqual(events, [
 			['first', 223],

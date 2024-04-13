@@ -7,7 +7,13 @@ export class State {
 	#listeners = [];
 	#invokeListeners() {
 		this.#listeners.forEach(listener => {
-			getHandler(listener)(this.#data);
+			const handler = getHandler(listener);
+			const value = this.#data;
+			if (typeof handler == 'function') {
+				handler(value);
+			} else {
+				handler.target.set(handler.mapper(value));
+			}
 		});
 		this.#listeners = this.#listeners.filter(l => !l.once);
 	}
@@ -39,8 +45,10 @@ export class State {
 	listener(handler) {
 		return this.#listeners.find(l => getHandler(l) === handler);
 	}
-	off(handler) {
-		const idx = this.#listeners.findIndex(l => getHandler(l) === handler);
+	off(target) {
+		const idx = this.#listeners.findIndex(l => {
+			return getHandler(l) === target || target === l.handler.target;
+		});
 		if (idx >= 0) {
 			this.#listeners.splice(idx, 1);
 		}
@@ -50,12 +58,13 @@ export class State {
 	}
 	map(handler, meta = {}) {
 		const mapped = new State(this.get(), {kind: 'map', source: this, ...meta});
-		const mapper = v => {
-			mapped.set(handler(v));
+		const mapper = {
+			target: mapped,
+			mapper: handler,
 		};
-		mapped.meta().mapper = mapper;
 		this.on(mapper);
 		this.#meta.mapped.push(mapped);
 		return mapped;
 	}
 }
+// 62
