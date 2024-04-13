@@ -81,3 +81,10 @@ export function set(state, value) {
 	}
 	throw new Error(`cannot set ${String(state)}`);
 }
+
+export function on(state, handler, metadata) {
+	if (state instanceof State) {
+		return state.on(handler, metadata);
+	}
+	throw new Error(`cannot subscribe to ${String(state)}`);
+}

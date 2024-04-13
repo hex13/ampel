@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set } from '../src/state.js';
+import { State, get, set, on } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -50,8 +50,8 @@ describe('State', () => {
 	it('it should trigger listeners after setting value', () => {
 		const state = new State(10);
 		const { first, second, events } = createHandlers();
-		state.on(first);
-		state.on(second);
+		on(state, first);
+		on(state, second);
 
 		set(state, 123);
 		set(state, 456);
@@ -68,15 +68,15 @@ describe('State', () => {
 		const state = new State(10);
 		const { first, second, events } = createHandlers();
 
-		state.on(first);
-		state.on(second);
+		on(state, first);
+		on(state, second);
 		state.off(second);
 		set(state, 123);
 
 		state.off(first);
 		set(state, 456);
 
-		state.on(second);
+		on(state, second);
 		set(state, 789);
 
 		assert.deepStrictEqual(events, [
@@ -151,7 +151,7 @@ describe('State', () => {
 		assert.strictEqual(metaMapped[0], mapped);
 
 		assert.strictEqual(get(mapped), initial);
-		mapped.on(first);
+		on(mapped, first);
 
 		set(state, 123);
 		set(state, 456);
@@ -169,7 +169,7 @@ describe('State', () => {
 		const state = new State(initial);
 		const { first, second } = createHandlers();
 
-		state.on(first, {kotek: 'wlazł'});
+		on(state, first, {kotek: 'wlazł'});
 		state.once(second, {kotek: 'na płotek'});
 		assert.strictEqual(state.listener(first).kotek, 'wlazł');
 		assert.strictEqual(state.listener(second).kotek, 'na płotek');
