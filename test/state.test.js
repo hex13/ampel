@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set, on, off, once } from '../src/state.js';
+import { State, get, set, on, off, once, map } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -137,7 +137,7 @@ describe('State', () => {
 	it('state should be mappable', async () => {
 		const initial = 10;
 		const state = new State(initial);
-		const mapped = state.map(x => x + 100, {name: 'plus100'});
+		const mapped = map(state, x => x + 100, {name: 'plus100'});
 		const { first, events } = createHandlers();
 
 		assert.ok(mapped instanceof State);

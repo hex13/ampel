@@ -103,3 +103,10 @@ export function off(state, handler) {
 	throw new Error(`cannot unsubscribe from ${String(state)}`);
 }
 
+export function map(state, handler, metadata) {
+	if (state instanceof State) {
+		return state.map(handler, metadata);
+	}
+	throw new Error(`cannot map ${String(state)}`);
+}
+
