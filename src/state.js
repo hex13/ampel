@@ -50,9 +50,11 @@ export class State {
 	}
 	map(handler, meta = {}) {
 		const mapped = new State(this.get(), {kind: 'map', source: this, ...meta});
-		this.on(v => {
+		const mapper = v => {
 			mapped.set(handler(v));
-		});
+		};
+		mapped.meta().mapper = mapper;
+		this.on(mapper);
 		this.#meta.mapped.push(mapped);
 		return mapped;
 	}
