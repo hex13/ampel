@@ -155,7 +155,7 @@ describe('State', () => {
 
 		set(state, 123);
 		set(state, 456);
-		off(state, mapped);
+		mapped.stop();
 		set(state, 777);
 
 		assert.deepStrictEqual(events, [

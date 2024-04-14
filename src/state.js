@@ -9,11 +9,7 @@ export class State {
 		this.#listeners.forEach(listener => {
 			const handler = getHandler(listener);
 			const value = this.#data;
-			if (typeof handler == 'function') {
-				handler(value);
-			} else {
-				handler.target.set(handler.mapper(value));
-			}
+			handler(value);
 		});
 		this.#listeners = this.#listeners.filter(l => !l.once);
 	}
@@ -56,16 +52,6 @@ export class State {
 	then(handler) {
 		this.once(handler);
 	}
-	map(handler, meta = {}) {
-		const mapped = new State(this.get(), {kind: 'map', source: this, ...meta});
-		const mapper = {
-			target: mapped,
-			mapper: handler,
-		};
-		this.on(mapper);
-		this.#meta.mapped.push(mapped);
-		return mapped;
-	}
 }
 
 export function get(state) {
@@ -103,9 +89,28 @@ export function off(state, handler) {
 	throw new Error(`cannot unsubscribe from ${String(state)}`);
 }
 
-export function map(state, handler, metadata) {
+
+export function pipe(src, dest, mapper) {
+	const handler = value => {
+		set(dest, mapper(value));
+	};
+	on(src, handler);
+	return () => {
+		off(src, handler);
+	}
+};
+
+export function map(state, handler, meta) {
 	if (state instanceof State) {
-		return state.map(handler, metadata);
+		const mapped = new State(state.get());
+		Object.assign(mapped.meta(), {
+			...meta,
+			kind: 'map',
+			source: state,
+		});
+		mapped.stop = pipe(state, mapped, handler);
+		state.meta().mapped.push(mapped);
+		return mapped;
 	}
 	throw new Error(`cannot map ${String(state)}`);
 }
