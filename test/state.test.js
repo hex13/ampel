@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set, on, off, once, map } from '../src/state.js';
+import { State, get, set, on, off, once, map, computed } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -28,7 +28,7 @@ describe('State', () => {
 	});
 	it('after creation has metadata', () => {
 		const meta = {x: 'bzium'};
-		const emptyMeta = {mapped: []};
+		const emptyMeta = {deps: [], mapped: []};
 		assert.deepStrictEqual(new State(122).meta(), emptyMeta);
 		assert.deepStrictEqual(new State(122, meta).meta(), {
 			...emptyMeta,
@@ -173,6 +173,30 @@ describe('State', () => {
 		once(state, second, {kotek: 'na płotek'});
 		assert.strictEqual(state.listener(first).kotek, 'wlazł');
 		assert.strictEqual(state.listener(second).kotek, 'na płotek');
+	});
+
+
+	it('computed()', () => {
+		const a = new State(10);
+		const b = new State(3);
+		const formula = (a, b) => a * (b + b) + 1;
+		const double = computed(get => {
+			return get(a) * (get(b) + get(b)) + 1;
+		});
+		assert.ok(double instanceof State);
+		assert.strictEqual(get(double), formula(10, 3));
+
+		const meta = double.meta();
+		assert.strictEqual(meta.deps.length, 2);
+		assert.strictEqual(meta.deps[0], a);
+		assert.strictEqual(meta.deps[1], b);
+
+		set(a, 11);
+		assert.strictEqual(get(double), formula(11, 3));
+
+		set(b, 1);
+		assert.strictEqual(get(double), formula(11, 1));
+
 	});
 
 });

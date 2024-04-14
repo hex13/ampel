@@ -17,6 +17,7 @@ export class State {
 		this.#data = initial;
 		this.#meta = {
 			mapped: [],
+			deps: [],
 			...meta,
 		};
 	}
@@ -115,3 +116,23 @@ export function map(state, handler, meta) {
 	throw new Error(`cannot map ${String(state)}`);
 }
 
+export function computed(f) {
+	const s = new State();
+
+	const deps = s.meta().deps;
+	const _get = (source) => {
+		// TODO check if some deps are not needed anymore after next computation
+		if (!deps.includes(source)) {
+			deps.push(source);
+		}
+		return get(source);
+	}
+	const compute = () => {
+		return f(_get);
+	};
+	set(s, compute());
+	deps.forEach(dep => {
+		pipe(dep, s, compute);
+	});
+	return s;
+}
