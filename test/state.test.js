@@ -28,7 +28,7 @@ describe('State', () => {
 	});
 	it('after creation has metadata', () => {
 		const meta = {x: 'bzium'};
-		const emptyMeta = {deps: [], mapped: []};
+		const emptyMeta = {deps: [], mapped: [], auto: true};
 		assert.deepStrictEqual(new State(122).meta(), emptyMeta);
 		assert.deepStrictEqual(new State(122, meta).meta(), {
 			...emptyMeta,
@@ -62,6 +62,18 @@ describe('State', () => {
 			['first', 456],
 			['second', 456],
 		]);
+	});
+
+	it('it shouldn\'t trigger listeners when setting auto to false', () => {
+		const state = new State(10, {auto: false});
+		const { first, second, events } = createHandlers();
+		on(state, first);
+		on(state, second);
+
+		set(state, 123);
+		set(state, 456);
+
+		assert.deepStrictEqual(events, []);
 	});
 
 	it('it should be possible to off and on listeners', () => {

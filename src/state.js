@@ -6,6 +6,7 @@ export class State {
 	#meta;
 	#listeners = [];
 	#invokeListeners() {
+		if (!this.meta().auto) return;
 		this.#listeners.forEach(listener => {
 			const handler = getHandler(listener);
 			const value = this.#data;
@@ -18,6 +19,7 @@ export class State {
 		this.#meta = {
 			mapped: [],
 			deps: [],
+			auto: true,
 			...meta,
 		};
 	}
