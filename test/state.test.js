@@ -21,6 +21,28 @@ function createHandlers() {
 	return { first, second, events };
 }
 
+function initMapped() {
+	const initial = 10;
+	const state = new State(initial);
+	const mapped = map(state, x => x + 100, {name: 'plus100',});
+
+	assert.ok(mapped instanceof State);
+
+	assert.strictEqual(mapped.meta().source, state);
+	assert.strictEqual(mapped.meta().name, 'plus100');
+	assert.strictEqual(mapped.meta().kind, 'map');
+
+	const metaMapped = state.meta().mapped;
+	assert.strictEqual(metaMapped.length, 1);
+	assert.strictEqual(metaMapped[0], mapped);
+
+	assert.strictEqual(get(mapped), initial);
+	return {
+		mapped,
+		state,
+	};
+}
+
 describe('State', () => {
 	it('after creation get(state) returns initial value', () => {
 		const state = new State(122);
@@ -147,22 +169,8 @@ describe('State', () => {
 	});
 
 	it('state should be mappable', async () => {
-		const initial = 10;
-		const state = new State(initial);
-		const mapped = map(state, x => x + 100, {name: 'plus100'});
-		const { first, events } = createHandlers();
-
-		assert.ok(mapped instanceof State);
-
-		assert.strictEqual(mapped.meta().source, state);
-		assert.strictEqual(mapped.meta().name, 'plus100');
-		assert.strictEqual(mapped.meta().kind, 'map');
-
-		const metaMapped = state.meta().mapped;
-		assert.strictEqual(metaMapped.length, 1);
-		assert.strictEqual(metaMapped[0], mapped);
-
-		assert.strictEqual(get(mapped), initial);
+		const { mapped, state } = initMapped();
+		const {first, events} = createHandlers();
 		on(mapped, first);
 
 		set(state, 123);
