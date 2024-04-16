@@ -41,12 +41,12 @@ describe('State', () => {
 		assert.strictEqual(get(state), 122);
 	});
 	it('after creation has default metadata', () => {
-		let meta = new State(122).meta();
+		let meta = new State(122).meta;
 		assert.deepStrictEqual(meta.deps, []);
 		assert.deepStrictEqual(meta.mapped, []);
 	});
 	it('after creation has extra metadata if passed in constructor', () => {
-		let meta = new State(122, {x: 'bzium'}).meta();
+		let meta = new State(122, {x: 'bzium'}).meta;
 		assert.strictEqual(meta.x, 'bzium');
 		assert.deepStrictEqual(meta.deps, []);
 		assert.deepStrictEqual(meta.mapped, []);
@@ -207,7 +207,7 @@ describe('State', () => {
 		assert.ok(double instanceof State);
 		assert.strictEqual(get(double), formula(10, 3));
 
-		const meta = double.meta();
+		const meta = double.meta;
 		assert.strictEqual(meta.deps.length, 2);
 		assert.strictEqual(meta.deps[0], a);
 		assert.strictEqual(meta.deps[1], b);

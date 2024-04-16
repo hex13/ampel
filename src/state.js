@@ -2,7 +2,6 @@ const getHandler = listener => listener.handler;
 const createListener = handler => ({ handler });
 
 export class State {
-	#meta;
 	#listeners = [];
 	#invokeListeners() {
 		this.#listeners.forEach(listener => {
@@ -13,7 +12,7 @@ export class State {
 	}
 	constructor(initial, meta = {}) {
 		this.value = initial;
-		this.#meta = {
+		this.meta = {
 			mapped: [],
 			deps: [],
 			pipes: [],
@@ -22,9 +21,6 @@ export class State {
 			},
 			...meta,
 		};
-	}
-	meta() {
-		return this.#meta;
 	}
 	on(handler, meta = {}) {
 		const listener = createListener(handler);
@@ -60,7 +56,7 @@ export function get(state) {
 export function set(state, value) {
 	if (state instanceof State) {
 		state.value = value;
-		state.meta().onSet(value);
+		state.meta.onSet(value);
 		return;
 	}
 	throw new Error(`cannot set ${String(state)}`);
@@ -108,12 +104,12 @@ export function map(state, handler, meta) {
 export function computed(f) {
 	const s = new State();
 
-	const deps = s.meta().deps;
+	const deps = s.meta.deps;
 	const _get = (source) => {
 		// TODO check if some deps are not needed anymore after next computation
 		if (!deps.includes(source)) {
 			deps.push(source);
-			s.meta().pipes.push(pipe(source, s, compute));
+			s.meta.pipes.push(pipe(source, s, compute));
 		}
 		return get(source);
 	}
@@ -125,7 +121,7 @@ export function computed(f) {
 }
 
 export function detach(state) {
-	state.meta().pipes.forEach(stop => {
+	state.meta.pipes.forEach(stop => {
 		stop();
 	});
 	state.meta().deps.length = 0;
