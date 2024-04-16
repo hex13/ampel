@@ -32,13 +32,8 @@ export class State {
 	listener(handler) {
 		return this.#listeners.find(l => l.handler === handler);
 	}
-	off(target) {
-		const idx = this.#listeners.findIndex(l => {
-			return l.handler === target || target === l.handler.target;
-		});
-		if (idx >= 0) {
-			this.#listeners.splice(idx, 1);
-		}
+	off(handler) {
+		this.#listeners = this.#listeners.filter(l => l.handler !== handler);
 	}
 	then(handler) {
 		this.once(handler);
