@@ -18,6 +18,7 @@ export class State {
 		this.#meta = {
 			mapped: [],
 			deps: [],
+			pipes: [],
 			onSet: () => {
 				this.#invokeListeners();
 			},
@@ -106,15 +107,7 @@ export function pipe(src, dest, mapper) {
 
 export function map(state, handler, meta) {
 	if (state instanceof State) {
-		const mapped = new State(state.get());
-		Object.assign(mapped.meta(), {
-			...meta,
-			kind: 'map',
-			source: state,
-		});
-		mapped.stop = pipe(state, mapped, handler);
-		state.meta().mapped.push(mapped);
-		return mapped;
+		return computed(get => handler(get(state)));
 	}
 	throw new Error(`cannot map ${String(state)}`);
 }
@@ -127,6 +120,7 @@ export function computed(f) {
 		// TODO check if some deps are not needed anymore after next computation
 		if (!deps.includes(source)) {
 			deps.push(source);
+			s.meta().pipes.push(pipe(source, s, compute));
 		}
 		return get(source);
 	}
@@ -134,8 +128,12 @@ export function computed(f) {
 		return f(_get);
 	};
 	set(s, compute());
-	deps.forEach(dep => {
-		pipe(dep, s, compute);
-	});
 	return s;
+}
+
+export function detach(state) {
+	state.meta().pipes.forEach(stop => {
+		stop();
+	});
+	state.meta().deps.length = 0;
 }

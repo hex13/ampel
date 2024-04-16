@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { State, get, set, on, off, once, map, computed } from '../src/state.js';
+import { State, get, set, on, off, once, map, computed, detach } from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -28,15 +28,7 @@ function initMapped() {
 
 	assert.ok(mapped instanceof State);
 
-	assert.strictEqual(mapped.meta().source, state);
-	assert.strictEqual(mapped.meta().name, 'plus100');
-	assert.strictEqual(mapped.meta().kind, 'map');
-
-	const metaMapped = state.meta().mapped;
-	assert.strictEqual(metaMapped.length, 1);
-	assert.strictEqual(metaMapped[0], mapped);
-
-	assert.strictEqual(get(mapped), initial);
+	assert.strictEqual(get(mapped), 110);
 	return {
 		mapped,
 		state,
@@ -182,8 +174,9 @@ describe('State', () => {
 		on(mapped, first);
 
 		set(state, 123);
+		assert.strictEqual(get(mapped), 223);
 		set(state, 456);
-		mapped.stop();
+		detach(mapped);
 		set(state, 777);
 
 		assert.deepStrictEqual(events, [
@@ -224,6 +217,12 @@ describe('State', () => {
 
 		set(b, 1);
 		assert.strictEqual(get(double), formula(11, 1));
+
+		detach(double);
+		set(a, 100);
+		set(b, 100);
+		assert.strictEqual(get(double), formula(11, 1));
+		assert.strictEqual(meta.deps.length, 0);
 
 	});
 
