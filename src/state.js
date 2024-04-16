@@ -124,5 +124,5 @@ export function detach(state) {
 	state.meta.pipes.forEach(stop => {
 		stop();
 	});
-	state.meta().deps.length = 0;
+	state.meta.deps.length = 0;
 }
