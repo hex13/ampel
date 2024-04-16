@@ -88,8 +88,13 @@ describe('State', () => {
 		]);
 	});
 
-	it('it shouldn\'t trigger listeners when setting auto to false', () => {
-		const state = new State(10, {auto: false});
+	it('when onSet() is present: it should trigger onSet() instead of automatically updating', () => {
+		const onSetCalls = [];
+		const state = new State(10, {
+			onSet(v) {
+				onSetCalls.push(v);
+			}
+		});
 		const { first, second, events } = createHandlers();
 		on(state, first);
 		on(state, second);
@@ -98,6 +103,7 @@ describe('State', () => {
 		set(state, 456);
 
 		assert.deepStrictEqual(events, []);
+		assert.deepStrictEqual(onSetCalls, [123, 456]);
 	});
 
 	it('it should be possible to off and on listeners', () => {

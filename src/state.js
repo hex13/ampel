@@ -6,7 +6,6 @@ export class State {
 	#meta;
 	#listeners = [];
 	#invokeListeners() {
-		if (!this.meta().auto) return;
 		this.#listeners.forEach(listener => {
 			const handler = getHandler(listener);
 			const value = this.#data;
@@ -19,7 +18,9 @@ export class State {
 		this.#meta = {
 			mapped: [],
 			deps: [],
-			auto: true,
+			onSet: () => {
+				this.#invokeListeners();
+			},
 			...meta,
 		};
 	}
@@ -31,7 +32,7 @@ export class State {
 	}
 	set(v) {
 		this.#data = v;
-		this.#invokeListeners();
+		this.meta().onSet(v);
 	}
 	on(handler, meta = {}) {
 		const listener = createListener(handler);
