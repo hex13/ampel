@@ -1,15 +1,15 @@
 const getHandler = listener => listener.handler;
 const createListener = handler => ({ handler });
 
+function invokeListeners(listeners, value) {
+	listeners.forEach(listener => {
+		listener.handler(value);
+	});
+	return listeners.filter(l => !l.once);
+}
+
 export class State {
 	#listeners = [];
-	#invokeListeners() {
-		this.#listeners.forEach(listener => {
-			const handler = getHandler(listener);
-			handler(this.value);
-		});
-		this.#listeners = this.#listeners.filter(l => !l.once);
-	}
 	constructor(initial, meta = {}) {
 		this.value = initial;
 		this.meta = {
@@ -17,7 +17,7 @@ export class State {
 			deps: [],
 			pipes: [],
 			onSet: () => {
-				this.#invokeListeners();
+				this.#listeners = invokeListeners(this.#listeners, this.value);
 			},
 			...meta,
 		};
