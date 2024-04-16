@@ -12,7 +12,6 @@ export class State {
 	constructor(initial, meta = {}) {
 		this.value = initial;
 		this.meta = {
-			mapped: [],
 			deps: [],
 			pipes: [],
 			onSet: () => {
@@ -76,7 +75,6 @@ export function off(state, handler) {
 	}
 	throw new Error(`cannot unsubscribe from ${String(state)}`);
 }
-
 
 export function pipe(src, dest, mapper) {
 	const handler = value => {
