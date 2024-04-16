@@ -26,13 +26,6 @@ export class State {
 	meta() {
 		return this.#meta;
 	}
-	get() {
-		return this.value;
-	}
-	set(v) {
-		this.value = v;
-		this.meta().onSet(v);
-	}
 	on(handler, meta = {}) {
 		const listener = createListener(handler);
 		Object.assign(listener, meta);
@@ -59,14 +52,16 @@ export class State {
 
 export function get(state) {
 	if (state instanceof State) {
-		return state.get();
+		return state.value;
 	}
 	throw new Error(`cannot get from ${String(state)}`);
 }
 
 export function set(state, value) {
 	if (state instanceof State) {
-		return state.set(value);
+		state.value = value;
+		state.meta().onSet(value);
+		return;
 	}
 	throw new Error(`cannot set ${String(state)}`);
 }
