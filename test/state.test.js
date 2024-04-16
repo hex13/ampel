@@ -48,14 +48,16 @@ describe('State', () => {
 		const state = new State(122);
 		assert.strictEqual(get(state), 122);
 	});
-	it('after creation has metadata', () => {
-		const meta = {x: 'bzium'};
-		const emptyMeta = {deps: [], mapped: [], auto: true};
-		assert.deepStrictEqual(new State(122).meta(), emptyMeta);
-		assert.deepStrictEqual(new State(122, meta).meta(), {
-			...emptyMeta,
-			...meta,
-		});
+	it('after creation has default metadata', () => {
+		let meta = new State(122).meta();
+		assert.deepStrictEqual(meta.deps, []);
+		assert.deepStrictEqual(meta.mapped, []);
+	});
+	it('after creation has extra metadata if passed in constructor', () => {
+		let meta = new State(122, {x: 'bzium'}).meta();
+		assert.strictEqual(meta.x, 'bzium');
+		assert.deepStrictEqual(meta.deps, []);
+		assert.deepStrictEqual(meta.mapped, []);
 	});
 	it('it should be possible to set and get value ', () => {
 		checkSetGet(new State(122), 439);
