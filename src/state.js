@@ -1,4 +1,3 @@
-const getHandler = listener => listener.handler;
 const createListener = handler => ({ handler });
 
 function invokeListeners(listeners, value) {
@@ -31,11 +30,11 @@ export class State {
 		this.on(handler, {...meta, once: true});
 	}
 	listener(handler) {
-		return this.#listeners.find(l => getHandler(l) === handler);
+		return this.#listeners.find(l => l.handler === handler);
 	}
 	off(target) {
 		const idx = this.#listeners.findIndex(l => {
-			return getHandler(l) === target || target === l.handler.target;
+			return l.handler === target || target === l.handler.target;
 		});
 		if (idx >= 0) {
 			this.#listeners.splice(idx, 1);
