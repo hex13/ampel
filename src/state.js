@@ -15,6 +15,7 @@ export class State {
 			deps: [],
 			sinks: [],
 			pipes: [],
+			isDirty: false,
 			onSet: () => {
 				this.#listeners = invokeListeners(this.#listeners, this.value);
 			},
@@ -119,4 +120,11 @@ export function detach(state) {
 		stop();
 	});
 	state.meta.deps.length = 0;
+}
+
+export function invalidate(state) {
+	state.meta.isDirty = true;
+	state.meta.sinks.forEach(sink => {
+		invalidate(sink);
+	});
 }

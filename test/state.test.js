@@ -1,5 +1,10 @@
 import * as assert from 'node:assert';
-import { State, get, set, on, off, once, map, computed, detach } from '../src/state.js';
+import {
+	State,
+	get, set, on, off, once,
+	map, computed, detach,
+	invalidate,
+} from '../src/state.js';
 
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
@@ -44,12 +49,14 @@ describe('State', () => {
 		let meta = new State(122).meta;
 		assert.deepStrictEqual(meta.deps, []);
 		assert.deepStrictEqual(meta.sinks, []);
+		assert.strictEqual(meta.isDirty, false);
 	});
 	it('after creation has extra metadata if passed in constructor', () => {
 		let meta = new State(122, {x: 'bzium'}).meta;
 		assert.strictEqual(meta.x, 'bzium');
 		assert.deepStrictEqual(meta.deps, []);
 		assert.deepStrictEqual(meta.sinks, []);
+		assert.strictEqual(meta.isDirty, false);
 	});
 	it('it should be possible to set and get value ', () => {
 		checkSetGet(new State(122), 439);
@@ -228,7 +235,19 @@ describe('State', () => {
 		set(b, 100);
 		assert.strictEqual(get(double), formula(11, 1));
 		assert.strictEqual(double.meta.deps.length, 0);
+	});
 
+	it('invalidate()', () => {
+		const a = new State(10);
+		const b = computed(get => get(a) + 2);
+		const c = computed(get => get(b) + 2);
+		assert.strictEqual(a.meta.isDirty, false);
+		assert.strictEqual(b.meta.isDirty, false);
+		assert.strictEqual(c.meta.isDirty, false);
+		invalidate(a);
+		assert.strictEqual(a.meta.isDirty, true);
+		assert.strictEqual(b.meta.isDirty, true);
+		assert.strictEqual(c.meta.isDirty, true);
 	});
 
 });
