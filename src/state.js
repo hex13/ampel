@@ -28,6 +28,9 @@ export class State {
 			sink.invalidate();
 		});
 	}
+	compute() {
+		return this.value;
+	}
 	on(handler, meta = {}) {
 		const listener = createListener(handler);
 		Object.assign(listener, meta);
@@ -84,9 +87,9 @@ export function off(state, handler) {
 	throw new Error(`cannot unsubscribe from ${String(state)}`);
 }
 
-export function pipe(src, dest, mapper) {
+export function pipe(src, dest) {
 	const handler = value => {
-		set(dest, mapper(value));
+		invalidate(dest);
 	};
 	src.meta.sinks.push(dest);
 	on(src, handler);
@@ -110,14 +113,15 @@ export function computed(f) {
 		// TODO check if some deps are not needed anymore after next computation
 		if (!deps.includes(source)) {
 			deps.push(source);
-			s.meta.pipes.push(pipe(source, s, compute));
+			s.meta.pipes.push(pipe(source, s));
 		}
 		return get(source);
 	}
 	const compute = () => {
 		return f(_get);
 	};
-	set(s, compute());
+	set(s, f(_get));
+	s.compute = () => f(get);
 	return s;
 }
 
@@ -130,4 +134,5 @@ export function detach(state) {
 
 export function invalidate(state) {
 	state.invalidate();
+	set(state, state.compute());
 }
