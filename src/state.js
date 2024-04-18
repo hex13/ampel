@@ -22,6 +22,12 @@ export class State {
 			...meta,
 		};
 	}
+	invalidate() {
+		this.meta.isDirty = true;
+		this.meta.sinks.forEach(sink => {
+			sink.invalidate();
+		});
+	}
 	on(handler, meta = {}) {
 		const listener = createListener(handler);
 		Object.assign(listener, meta);
@@ -123,8 +129,5 @@ export function detach(state) {
 }
 
 export function invalidate(state) {
-	state.meta.isDirty = true;
-	state.meta.sinks.forEach(sink => {
-		invalidate(sink);
-	});
+	state.invalidate();
 }
