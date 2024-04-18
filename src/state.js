@@ -50,6 +50,12 @@ export class State {
 	then(handler) {
 		this.once(handler);
 	}
+	update() {
+		if (this.meta.isDirty) {
+			this.value = this.compute();
+			this.meta.isDirty = false;
+		}
+	}
 }
 
 export function get(state) {

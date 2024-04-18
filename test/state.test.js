@@ -6,6 +6,10 @@ import {
 	invalidate,
 } from '../src/state.js';
 
+function isDirty(state) {
+	return state.meta.isDirty;
+}
+
 function checkSetGet(state, nv) {
 	let nv_copy = structuredClone(nv);
 	set(state, nv);
@@ -193,6 +197,30 @@ describe('State', () => {
 			['first', 556],
 		]);
 	});
+
+	it('state should be mappable (pull mode)', async () => {
+		const events = [];
+		const state = new State(0, {onInvalidate() {
+		}});
+		const mapped = map(state, x => {
+			events.push(x);
+			return x + 123;
+		}, {name: 'plus100',});
+
+		assert.strictEqual(get(mapped), 123);
+		assert.deepStrictEqual(events, [0]);
+
+		set(state, 10);
+
+		assert.strictEqual(get(mapped), 123);
+		assert.deepStrictEqual(events, [0]);
+
+		mapped.update();
+
+		assert.deepStrictEqual(get(mapped), 133);
+		assert.deepStrictEqual(events, [0, 10]);
+	});
+
 
 	it('metadata for listeners', async () => {
 		const initial = 10;
