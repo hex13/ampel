@@ -13,6 +13,7 @@ export class State {
 		this.value = initial;
 		this.meta = {
 			deps: [],
+			sinks: [],
 			pipes: [],
 			onSet: () => {
 				this.#listeners = invokeListeners(this.#listeners, this.value);
@@ -80,6 +81,7 @@ export function pipe(src, dest, mapper) {
 	const handler = value => {
 		set(dest, mapper(value));
 	};
+	src.meta.sinks.push(dest);
 	on(src, handler);
 	return () => {
 		off(src, handler);
