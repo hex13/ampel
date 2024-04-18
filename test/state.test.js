@@ -87,13 +87,14 @@ describe('State', () => {
 		]);
 	});
 
-	it('when onSet() is present: it should trigger onSet() instead of automatically updating', () => {
+	it('when onIvalidate() is present: it should trigger onIvalidate() instead of automatically updating', () => {
 		const onSetCalls = [];
 		const state = new State(10, {
-			onSet(v) {
+			onInvalidate(v) {
 				onSetCalls.push(v);
 			}
 		});
+		assert.strictEqual(state.meta.isDirty, false);
 		const { first, second, events } = createHandlers();
 		on(state, first);
 		on(state, second);
@@ -101,6 +102,7 @@ describe('State', () => {
 		set(state, 123);
 		set(state, 456);
 
+		assert.strictEqual(state.meta.isDirty, true);
 		assert.deepStrictEqual(events, []);
 		assert.deepStrictEqual(onSetCalls, [123, 456]);
 	});
@@ -237,8 +239,8 @@ describe('State', () => {
 		assert.strictEqual(double.meta.deps.length, 0);
 	});
 
-	it('invalidate()', () => {
-		const a = new State(10);
+	it('manual invalidating', () => {
+		const a = new State(10, {onInvalidate() {}});
 		const b = computed(get => get(a) + 2);
 		const c = computed(get => get(b) + 2);
 		assert.strictEqual(a.meta.isDirty, false);

@@ -16,8 +16,10 @@ export class State {
 			sinks: [],
 			pipes: [],
 			isDirty: false,
-			onSet: () => {
+			onInvalidate: () => {
+				this.value = this.compute();
 				this.#listeners = invokeListeners(this.#listeners, this.value);
+				this.meta.isDirty = false;
 			},
 			...meta,
 		};
@@ -60,7 +62,7 @@ export function get(state) {
 export function set(state, value) {
 	if (state instanceof State) {
 		state.value = value;
-		state.meta.onSet(value);
+		invalidate(state);
 		return;
 	}
 	throw new Error(`cannot set ${String(state)}`);
@@ -134,5 +136,5 @@ export function detach(state) {
 
 export function invalidate(state) {
 	state.invalidate();
-	set(state, state.compute());
+	state.meta.onInvalidate(state.value);
 }
