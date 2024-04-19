@@ -1,10 +1,12 @@
 import * as assert from 'node:assert';
 import {
-	State,
+	Signal,
 	get, set, on, off, once,
 	map, computed, detach,
 	invalidate,
-} from '../src/state.js';
+} from '../src/signal.js';
+
+const State = Signal;
 
 function isDirty(state) {
 	return state.meta.isDirty;
@@ -44,7 +46,7 @@ function initMapped() {
 	};
 }
 
-describe('State', () => {
+describe('Signal', () => {
 	it('after creation get(state) returns initial value', () => {
 		const state = new State(122);
 		assert.strictEqual(get(state), 122);
@@ -197,7 +199,6 @@ describe('State', () => {
 			['first', 556],
 		]);
 	});
-
 	it('state should be mappable (pull mode)', async () => {
 		const events = [];
 		const state = new State(0, {onInvalidate() {

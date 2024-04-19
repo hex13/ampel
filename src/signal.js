@@ -7,7 +7,7 @@ function invokeListeners(listeners, value) {
 	return listeners.filter(l => !l.once);
 }
 
-export class State {
+export class Signal {
 	#listeners = [];
 	constructor(initial, meta = {}) {
 		this.value = initial;
@@ -59,14 +59,14 @@ export class State {
 }
 
 export function get(state) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		return state.value;
 	}
 	throw new Error(`cannot get from ${String(state)}`);
 }
 
 export function set(state, value) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		state.value = value;
 		invalidate(state);
 		return;
@@ -75,21 +75,21 @@ export function set(state, value) {
 }
 
 export function on(state, handler, metadata) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		return state.on(handler, metadata);
 	}
 	throw new Error(`cannot subscribe to ${String(state)}`);
 }
 
 export function once(state, handler, metadata) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		return state.once(handler, metadata);
 	}
 	throw new Error(`cannot subscribe once to ${String(state)}`);
 }
 
 export function off(state, handler) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		return state.off(handler);
 	}
 	throw new Error(`cannot unsubscribe from ${String(state)}`);
@@ -107,14 +107,14 @@ export function pipe(src, dest) {
 };
 
 export function map(state, handler, meta) {
-	if (state instanceof State) {
+	if (state instanceof Signal) {
 		return computed(get => handler(get(state)));
 	}
 	throw new Error(`cannot map ${String(state)}`);
 }
 
 export function computed(f) {
-	const s = new State();
+	const s = new Signal();
 
 	const deps = s.meta.deps;
 	const _get = (source) => {
@@ -144,3 +144,4 @@ export function invalidate(state) {
 	state.invalidate();
 	state.meta.onInvalidate(state.value);
 }
+// 140 ; 127 ; 122 ; 121 ; 131
