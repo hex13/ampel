@@ -1,5 +1,5 @@
 const createListener = handler => ({ handler });
-const MULTISIGNAL = Symbol('MULTISIGNAL');
+export const MULTISIGNAL = Symbol('MULTISIGNAL');
 
 function invokeListeners(listeners, value) {
 	listeners.forEach(listener => {
