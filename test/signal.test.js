@@ -1,6 +1,7 @@
 import * as assert from 'node:assert';
 import {
 	Signal,
+	MultiSignal,
 	get, set, on, off, once,
 	map, computed, detach,
 	invalidate,
@@ -281,4 +282,42 @@ describe('Signal', () => {
 		assert.strictEqual(c.meta.isDirty, true);
 	});
 
+});
+
+describe('MultiSignal', () => {
+	it('creates object with signals with initial values', () => {
+		const signals = MultiSignal({
+			x: 123,
+			y: 3,
+			z: -32,
+		});
+		const a = Object.entries(signals).map(([k, signal]) => {
+			assert.strictEqual(signal instanceof Signal, true);
+			return [k, get(signal)];
+		});
+		assert.deepStrictEqual(a, [
+			['x', 123],
+			['y', 3],
+			['z', -32],
+		]);
+	});
+
+	it('allows for listening to whole object', () => {
+		const signals = MultiSignal({
+			x: 123,
+			y: 3,
+			z: -32,
+		});
+		const events = [];
+		on(signals, value => {
+			events.push(['update', {...value}]);
+		});
+		assert.deepStrictEqual(events, []);
+		set(signals.x, 100);
+		set(signals.y, 50);
+		assert.deepStrictEqual(events, [
+			['update', {x: 100, y: 3, z: -32}],
+			['update', {x: 100, y: 50, z: -32}],
+		]);
+	});
 });

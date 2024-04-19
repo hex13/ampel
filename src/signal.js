@@ -1,4 +1,5 @@
 const createListener = handler => ({ handler });
+const MULTISIGNAL = Symbol('MULTISIGNAL');
 
 function invokeListeners(listeners, value) {
 	listeners.forEach(listener => {
@@ -58,6 +59,22 @@ export class Signal {
 	}
 }
 
+
+export function MultiSignal(initial) {
+	const multiSignal = new Signal({});
+	const state = {...initial};
+	const signals = {};
+	for (const k in initial) {
+		signals[k] = new Signal(initial[k]);
+		on(signals[k], x => {
+			state[k] = x;
+			set(multiSignal, state);
+		});
+	}
+	signals[MULTISIGNAL] = multiSignal;
+	return signals;
+}
+
 export function get(state) {
 	if (state instanceof Signal) {
 		return state.value;
@@ -77,6 +94,9 @@ export function set(state, value) {
 export function on(state, handler, metadata) {
 	if (state instanceof Signal) {
 		return state.on(handler, metadata);
+	}
+	if (state[MULTISIGNAL]) {
+		return state[MULTISIGNAL].on(handler, metadata);
 	}
 	throw new Error(`cannot subscribe to ${String(state)}`);
 }
