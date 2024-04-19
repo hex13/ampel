@@ -1,9 +1,9 @@
 {
   "name": "ampel",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "examples/signal.js",
   "scripts": {
     "test": "mocha",
     "build": "bun build examples/example.js > examples/bundle.js"
