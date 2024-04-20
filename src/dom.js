@@ -20,7 +20,23 @@ export function mount(container, params, createElement = document.createElement.
 	}
 	if (params.children) {
 		params.children.forEach(child => {
-			mount(el, child, createElement);
+			if (typeof child == 'string' || typeof child == 'number' || child instanceof Signal) {
+				mount(el, {type: 'span', text: child}, createElement);
+			} else {
+				mount(el, child, createElement);
+			}
+
 		});
 	}
+}
+
+export function jsx(type, props, ...children) {
+	const el = {
+		type,
+		props,
+	};
+	if (children.length > 0) {
+		el.children = children;
+	}
+	return el;
 }
