@@ -1,8 +1,8 @@
-Ampel - reactive library for signals 
+Ampel.js - reactive library for signals 
 ===
 
-Signals
-====
+Signal
+----
 
 ```js
 import { Signal, get, set, on } from 'ampel';
@@ -16,7 +16,7 @@ console.log(get(a));
 ```
 
 State (proxied reactive object)
-====
+----
 
 ```js
 import { State, on } from 'ampel';
