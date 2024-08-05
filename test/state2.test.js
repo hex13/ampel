@@ -1,6 +1,9 @@
 import * as assert from 'assert';
-import { State, DELTAS, on } from '../src/state2.js';
+import { State, DELTAS, on, once } from '../src/state2.js';
 
+const sleep = () => {
+    return new Promise(r => setTimeout(r, 0));
+};
 describe('State', () => {
     it('initial state', () => {
         const obj = {
@@ -99,4 +102,40 @@ describe('State', () => {
 
     });
 
+    it('once', async () => {
+        let events = [];
+        const onB = (v) => {
+            events.push(['b', v]);
+        };
+        const state = State({
+            a: 10,
+            b: 20,
+        });
+
+        let b = once(state, 'b');
+        b.then(onB);
+
+        state.a = 100;
+        await sleep();
+        assert.deepStrictEqual(events, []);
+
+        state.b = 200;
+        await sleep();
+
+        assert.deepStrictEqual(events, [
+            ['b', 200],
+        ]);
+        events = [];
+
+        state.b = 201;
+        await sleep();
+        assert.deepStrictEqual(events, []);
+
+        once(state, 'b').then(onB);
+        state.b = 202;
+        await sleep();
+        assert.deepStrictEqual(events, [
+            ['b', 202]
+        ]);
+    });
 });

@@ -1,6 +1,19 @@
 export const DELTAS = Symbol('DELTAS');
 export const LISTENERS = Symbol('LISTENERS');
 
+function Atom() {
+	let resolve, promise;
+	const trigger = (value) => {
+		resolve && resolve(value);
+		promise = new Promise(r => resolve = r);
+	};
+	trigger();
+	return {
+		then: (...args) => promise.then(...args),
+		trigger,
+	};
+};
+
 export function State(obj, opts = {}) {
 	const onUpdate = opts.onUpdate || (() => {});
 	const listeners = Object.create(null);
@@ -35,4 +48,16 @@ export function State(obj, opts = {}) {
 
 export function on(state, prop, f) {
 	state[LISTENERS][prop] = f;
+}
+
+export function once(state, prop, f) {
+	let listener = state[LISTENERS][prop];
+	if(!listener) {
+		const atom = Atom();
+		listener = state[LISTENERS][prop] = (v) => {
+			atom.trigger(v);
+		};
+		listener.atom = atom;
+	}
+	return listener.atom;
 }
