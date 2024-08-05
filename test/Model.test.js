@@ -37,10 +37,10 @@ describe('Model', () => {
 	});
 
 	it('update with links', () => {
-		const schema = {
+		const links = {
 			a: [{target: 'b', mapper: x => x + 2 }, {target: 'c', mapper: x => x + 10}],
 		};
-		const model = new Model({somethingWasHere: 123}, schema);
+		const model = new Model({somethingWasHere: 123}, { links });
 		const res = model.update({a: 11});
 		assert.deepStrictEqual(res, {
 			dirty: {

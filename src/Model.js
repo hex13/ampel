@@ -1,7 +1,7 @@
 export class Model {
-    constructor(data, links = {}) {
+    constructor(data, schema = {links: {}}) {
         this.data = data;
-        this.links = links;
+        this.links = schema.links;
         this.listeners = Object.create(null);
     }
     update(updates) {
