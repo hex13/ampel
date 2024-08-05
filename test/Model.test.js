@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { Model } from '../src/Model.js';
+import { Model, createDepsGatherer } from '../src/Model.js';
 
 const notify = (events, name) => (...args) => {
 	events.push([name, ...args]);
@@ -52,6 +52,21 @@ describe('Model', () => {
 		assert.strictEqual(model.data.c, 32);
 	});
 
+	it('computed properties', () => {
+		const model = new Model({
+			a: 10,
+			b: 21,
+			$c: state => state.a + state.b,
+		});
+		assert.strictEqual(model.data.c, 31);
+
+		model.update({a: 20});
+		assert.strictEqual(model.data.c, 41);
+
+		model.update({b: 22});
+		assert.strictEqual(model.data.c, 42);
+	});
+
 	it('invoke listeners ', () => {
 		const events = [];
 		const model = new Model({a: 123});
@@ -65,5 +80,17 @@ describe('Model', () => {
 			['a', 10],
 			['a-2', 10],
 		]);
+	});
+});
+
+describe('createDepsGatherer', () => {
+	it('gathers deps', () => {
+		const { proxy, deps } = createDepsGatherer({foo: 10, bar: 20, baz: 30});
+		assert.strictEqual(proxy.foo, 10);
+		assert.strictEqual(proxy.baz, 30);
+		assert.deepStrictEqual(deps, {
+			foo: true,
+			baz: true,
+		});
 	});
 });

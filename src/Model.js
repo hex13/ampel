@@ -3,6 +3,18 @@ export class Model {
         this.data = data;
         this.links = schema.links;
         this.listeners = Object.create(null);
+        for (const [k, v] of Object.entries(data)) {
+            if (typeof k == 'string' && k.startsWith('$')) {
+                const targetProp = k.slice(1);
+                const { proxy, deps } = createDepsGatherer(this.data);
+                v(proxy);
+                Object.keys(deps).forEach(dep => {
+                    this.link(dep, targetProp, v, true)
+                });
+            }
+        }
+        // emulate updating only for links to be runned
+        this.update(this.data);
     }
     update(updates) {
         return applyUpdates(this.data, updates, this.links)
@@ -49,4 +61,15 @@ function applyUpdates(target, updates, links) {
     return {
         dirty,
     };
+}
+
+export function createDepsGatherer(obj) {
+    const deps = {};
+    const proxy = new Proxy(obj, {
+        get(target, prop) {
+            deps[prop] = true;
+            return target[prop];
+        }
+    });
+    return { proxy, deps };
 }
