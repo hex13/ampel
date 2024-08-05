@@ -6,12 +6,10 @@ export class Model {
     }
     update(updates) {
         const computeInfo = compute(this.data, updates, this.links)
-        invokePropListeners(computeInfo.dirty, this.listeners);
         return computeInfo;
     }
     on(prop, listener) {
-        const propListeners = ensureProp(this.listeners, prop, () => []);
-        propListeners.push(listener);
+        ensureProp(this.links, prop, () => []).push({target: listener});
     }
 }
 
@@ -28,9 +26,13 @@ function compute(target, updates, links) {
     for (const [prop, value] of Object.entries(updates)) {
         if (Object.hasOwn(links, prop)) {
             links[prop].forEach(link => {
-                const mappedValue = link.mapper(value);
-                dirty[link.target] = mappedValue;
-                target[link.target] = mappedValue;
+                if (typeof link.target == 'function') {
+                    link.target(value)
+                } else {
+                    const mappedValue = link.mapper(value);
+                    dirty[link.target] = mappedValue;
+                    target[link.target] = mappedValue;
+                }
             });
         }
         target[prop] = value;
@@ -39,14 +41,4 @@ function compute(target, updates, links) {
     return {
         dirty,
     };
-}
-
-export function invokePropListeners(dirtyInfo, handlers) {
-    for (const [k, v] of Object.entries(dirtyInfo)) {
-        if (handlers[k]) {
-            handlers[k].forEach(handler => {
-                handler(v);
-            });
-        }
-    }
 }

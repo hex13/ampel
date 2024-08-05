@@ -1,28 +1,9 @@
 import * as assert from 'assert';
-import { Model, invokePropListeners } from '../src/Model.js';
+import { Model } from '../src/Model.js';
 
 const notify = (events, name) => (...args) => {
 	events.push([name, ...args]);
 };
-
-describe('invokePropListeners()', () => {
-	it('invoke listeners', () => {
-		const events = [];
-		invokePropListeners({
-			a: 100,
-			b: 234,
-		}, {
-			a: [notify(events, 'a')],
-			b: [notify(events, 'b'), notify(events, 'b-2')],
-			c: [notify(events, 'c')],
-		});
-		assert.deepStrictEqual(events, [
-			['a', 100],
-			['b', 234],
-			['b-2', 234],
-		]);
-	});
-});
 
 describe('Model', () => {
 	it('update', () => {
@@ -61,11 +42,14 @@ describe('Model', () => {
 		const events = [];
 		const model = new Model({a: 123});
 		model.on('a', notify(events, 'a'));
+		model.on('a', notify(events, 'a-2'));
+
 		model.update({b: 1});
 		assert.deepStrictEqual(events, []);
 		model.update({a: 10});
 		assert.deepStrictEqual(events, [
 			['a', 10],
+			['a-2', 10],
 		]);
 	});
 });
