@@ -10,12 +10,17 @@ export class Model {
         return computeInfo;
     }
     on(prop, listener) {
-        let propListeners = this.listeners[prop];
-        if (!propListeners) {
-            this.listeners[prop] = propListeners = [];
-        }
+        const propListeners = ensureProp(this.listeners, prop, () => []);
         propListeners.push(listener);
     }
+}
+
+function ensureProp(target, prop, create) {
+    let value = target[prop];
+    if (!value) {
+        target[prop] = create();
+    }
+    return target[prop];
 }
 
 function compute(target, updates, links) {
