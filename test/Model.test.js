@@ -38,6 +38,20 @@ describe('Model', () => {
 		});
 	});
 
+	it('link', () => {
+		const model = new Model({
+			a: 10,
+			b: 21,
+		});
+		model.link('a', 'c', state => state.a + state.b, true);
+
+		model.update({a: 11});
+		assert.strictEqual(model.data.c, 32);
+
+		model.update({b: 1000});
+		assert.strictEqual(model.data.c, 32);
+	});
+
 	it('invoke listeners ', () => {
 		const events = [];
 		const model = new Model({a: 123});
