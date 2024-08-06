@@ -10,9 +10,7 @@ describe('Model', () => {
 		const model = new Model({});
 		const res = model.update({a: 10});
 		assert.deepStrictEqual(res, {
-			dirty: {
-				a: 10,
-			},
+			a: 10,
 		});
 		assert.deepStrictEqual(model.data, {a: 10});
 	});
@@ -24,11 +22,9 @@ describe('Model', () => {
 		const model = new Model({somethingWasHere: 123}, { links });
 		const res = model.update({a: 11});
 		assert.deepStrictEqual(res, {
-			dirty: {
-				a: 11,
-				b: 13,
-				c: 21,
-			},
+			a: 11,
+			b: 13,
+			c: 21,
 		});
 		assert.deepStrictEqual(model.data, {
 			a: 11,

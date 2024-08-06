@@ -36,31 +36,24 @@ function ensureProp(target, prop, create) {
 }
 
 function applyUpdates(target, updates, links) {
-    const dirty = {};
-    const funcsToRun = [];
+    const newUpdates = {};
     for (const [prop, value] of Object.entries(updates)) {
+        target[prop] = value;
         if (Object.hasOwn(links, prop)) {
+            const value = target[prop];
             links[prop].forEach(link => {
                 if (typeof link.target == 'function') {
-                    link.target(value)
+                    link.target(value);
                 } else {
-                    funcsToRun.push(() => {
-                        const mappedValue = link.mapper(link.wholeState? target : value);
-                        dirty[link.target] = mappedValue;
-                        target[link.target] = mappedValue;
-                    });
+                    newUpdates[link.target] = link.mapper(link.wholeState? target : value);
                 }
             });
         }
-        target[prop] = value;
-        dirty[prop] = value;
     }
-    funcsToRun.forEach(f => {
-        f();
-    });
-    return {
-        dirty,
-    };
+    if (Object.keys(newUpdates).length > 0) {
+        applyUpdates(target, newUpdates, links);
+    }
+    return Object.assign(newUpdates, updates);
 }
 
 export function createDepsGatherer(obj) {
