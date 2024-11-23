@@ -41,13 +41,19 @@ export function Signal(initial) {
 
 export function MultiSignal(subscribe) {
 	const signals = Object.create(null);
-	return (eventType) => {
+	const ms = (eventType) => {
 		if (signals[eventType] && !signals[eventType].cancelled) return signals[eventType];
 		const s = Signal();
 		subscribe(eventType, s);
 		signals[eventType] = s;
 		return s;
 	};
+	ms.cancel = () => {
+		Object.values(signals).forEach(s => {
+			cancel(s);
+		});
+	};
+	return ms;
 }
 
 export function fromEventTarget(target) {

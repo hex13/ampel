@@ -150,5 +150,18 @@ describe('Ampel', () => {
 		assert.strictEqual(foo1, foo2);
 		assert.notStrictEqual(foo1, foo3);
 	});
+
+	it('MultiSignal: cancelling multiple signals at once', async () => {
+		const target = new EventTarget();
+		const multiSignal = A.MultiSignal(() => {});
+		const foo = multiSignal('foo');
+		const bar = multiSignal('foo');
+
+		assert.strictEqual(foo.cancelled, false);
+		assert.strictEqual(bar.cancelled, false);
+		multiSignal.cancel();
+		assert.strictEqual(foo.cancelled, true);
+		assert.strictEqual(bar.cancelled, true);
+	});
 });
 
