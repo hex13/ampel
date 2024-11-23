@@ -13,6 +13,7 @@ describe('Ampel', () => {
 		assert.strictEqual(A.isSignal(2), false);
 		assert.strictEqual(A.isSignal(null), false);
 	});
+
 	it('set & get', () => {
 		const s = new A.Signal(123);
 		s(456);
@@ -67,6 +68,37 @@ describe('Ampel', () => {
 		assert.strictEqual(await s, 'something different');
 	});
 
+	it('cancellation should prevent for setting new value', async () => {
+		const calls = [];
+		const s = A.Signal();
+		A.subscribe(s, (v) => {
+			calls.push(v);
+		});
+		s(123);
+		s(456);
+		const error = {text: 'some error'};
+		A.cancel(s, error);
+		s(789);
+
+		assert.strictEqual(s(), 456);
+	});
+
+	it('cancellation should propagate erros', async () => {
+		const values = [];
+		const s = A.Signal();
+
+		setTimeout(() => {
+			A.cancel(s, {text: 'Nevermore'});
+		}, 0);
+		let error = false;
+		try {
+			await s;
+		} catch (e) {
+			error = e;
+		}
+		assert.deepStrictEqual(error, {text: 'Nevermore'});
+	});
+
 	it('fromEventTarget', async () => {
 		const calls = [];
 		const target = new EventTarget();
@@ -104,6 +136,19 @@ describe('Ampel', () => {
 		});
 		assert.strictEqual(foo1, foo2);
 		assert.notStrictEqual(foo1, bar);
+	});
+
+	it('fromEventTarget: after cancellation should recreate signal', async () => {
+		const target = new EventTarget();
+		const getSignal = A.fromEventTarget(target);
+		let foo1, foo2, foo3;
+		foo1 = getSignal('foo');
+		foo2 = getSignal('foo');
+		A.cancel(foo1);
+		foo3 = getSignal('foo');
+
+		assert.strictEqual(foo1, foo2);
+		assert.notStrictEqual(foo1, foo3);
 	});
 });
 
