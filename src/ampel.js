@@ -7,7 +7,11 @@ export function isSignal(thing) {
 }
 
 export function cancel(signal, reason) {
-	signal.cancel(reason);
+	if (signal.cancel) {
+		signal.cancel(reason);
+	} else if (signal && typeof signal == 'object') {
+		Object.values(signal).forEach(s => s.cancel());
+	}
 }
 
 export function Signal(initial) {

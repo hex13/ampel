@@ -99,6 +99,18 @@ describe('Ampel', () => {
 		assert.deepStrictEqual(error, {text: 'Nevermore'});
 	});
 
+	it('A.cancel(): cancelling multiple signals at once when given object of signals', async () => {
+		const o = {
+			foo: A.Signal(),
+			bar: A.Signal(),
+		};
+		assert.strictEqual(o.foo.cancelled, false);
+		assert.strictEqual(o.bar.cancelled, false);
+		A.cancel(o);
+		assert.strictEqual(o.foo.cancelled, true);
+		assert.strictEqual(o.bar.cancelled, true);
+	});
+
 	it('fromEventTarget', async () => {
 		const calls = [];
 		const target = new EventTarget();
@@ -163,5 +175,6 @@ describe('Ampel', () => {
 		assert.strictEqual(foo.cancelled, true);
 		assert.strictEqual(bar.cancelled, true);
 	});
+
 });
 
