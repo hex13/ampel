@@ -1,35 +1,23 @@
-Ampel.js - reactive library for signals 
+Ampel.js - library for signals 
 ===
 
-Signal
-----
+example:
 
 ```js
-import { Signal, get, set, on } from 'ampel';
-const a = new Signal(10);
-on(a, v => {
-	console.log("value = ", v);
-})
-set(a, 123);
-set(a, 456);
-console.log(get(a));
-```
+import * as A from 'ampel';
 
-State (proxied reactive object)
-----
+const whenFirst = A.fromEventTarget(document.getElementById('first'));
+const whenSecond = A.fromEventTarget(document.getElementById('second'));
 
-```js
-import { State, on } from 'ampel';
-const a = State({
-	x: 10, y: 20,
-});
+async function main() {
+	while (true) {
+		alert("click first");
+		await whenFirst('click');
+		alert("click second");
+		await whenSecond('click');
+	}
+}
 
-on(a, v => {
-	console.log("value = ", v);
-});
-
-a.x = 11;
-a.y = 25;
-
+main();
 
 ```
