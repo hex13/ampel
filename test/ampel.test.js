@@ -176,5 +176,38 @@ describe('Ampel', () => {
 		assert.strictEqual(bar.cancelled, true);
 	});
 
+	it('cancelling object of signals should pass reason to these signals', async () => {
+		const errors = {};
+		const signals = {
+			foo: A.Signal(),
+			bar: A.Signal(),
+		};
+		setTimeout(() => {
+			A.cancel(signals, {text: 'Nevermore.'});
+		}, 0);
+		const p1 = (async () => {
+			let error;
+			try {
+				await signals.foo;
+			} catch (e) {
+				errors.foo = e;
+			}
+		})();
+		const p2 = (async () => {
+			let error;
+			try {
+				await signals.bar;
+			} catch (e) {
+				errors.bar = e;
+			}
+		})();
+
+		await Promise.all([p1, p2]);
+		assert.deepStrictEqual(errors, {
+			foo: {text: 'Nevermore.'},
+			bar: {text: 'Nevermore.'},
+		});
+	});
+
 });
 

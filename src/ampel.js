@@ -10,7 +10,7 @@ export function cancel(signal, reason) {
 	if (signal.cancel) {
 		signal.cancel(reason);
 	} else {
-		Object.values(signal.signals || signal).forEach(s => s.cancel());
+		Object.values(signal.signals || signal).forEach(s => s.cancel(reason));
 	}
 }
 
