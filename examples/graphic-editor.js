@@ -24,35 +24,23 @@ document.querySelectorAll('.mode').forEach(el => {
 
 const modes = {
 	async pencil() {
-		let pt1, pt2;
-		const e = await whenCanvas('pointerdown');
-		e.target.setPointerCapture(e.pointerId);
-		pt1 = getCoords(e);
-
-		while (true) {
-			const e = await Promise.any([whenCanvas('pointermove'), whenCanvas('pointerup')]);
-			if (e.type == 'pointerup') break;
-			pt2 = getCoords(e);
-			ctx.beginPath();
-			ctx.moveTo(pt1.x, pt1.y);
-			ctx.lineTo(pt2.x, pt2.y);
-			ctx.stroke();
-			pt1 = pt2;
+		for await (const { curr, last } of A.drag(whenCanvas, getCoords)) {
+			if (last) {
+				ctx.beginPath();
+				ctx.moveTo(curr.x, curr.y);
+				ctx.lineTo(last.x, last.y);
+				ctx.stroke();
+			}
 		}
 	},
 	async rectangle() {
 		let pt1, pt2;
-		const e = await whenCanvas('pointerdown');
-		e.target.setPointerCapture(e.pointerId);
-		pt1 = getCoords(e);
-
-		while (true) {
-			const e = await Promise.any([whenCanvas('pointermove'), whenCanvas('pointerup')]);
-			if (e.type == 'pointerup') break;
-			pt2 = getCoords(e);
+		for await (const { curr, last } of A.drag(whenCanvas, getCoords)) {
+			if (!pt1) pt1 = curr;
+			pt2 = curr;
 		}
 		ctx.fillRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
-	}
+	},
 };
 
 A.loop(async () => {

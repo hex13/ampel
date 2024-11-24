@@ -58,6 +58,20 @@ export function Signal(initial) {
 	return s;
 }
 
+export async function* drag(on, mapper = x => x) {
+	let last;
+	const e = await on('pointerdown');
+	e.target.setPointerCapture(e.pointerId);
+	yield { curr: mapper(e) };
+	while (true) {
+		const e = await Promise.any([on('pointermove'), on('pointerup')]);
+		const curr = mapper(e);
+		yield { curr, last };
+		if (e.type == 'pointerup') break;
+		last = curr;
+	}
+}
+
 export function MultiSignal(subscribe) {
 	const ms = (eventType) => {
 		if (ms.signals[eventType] && !ms.signals[eventType].cancelled) return ms.signals[eventType];
