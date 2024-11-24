@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.4",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/ampel.js",
   "scripts": {
     "test": "mocha",
     "build": "bun build examples/example.js > examples/bundle.js"
