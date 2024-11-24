@@ -6,6 +6,10 @@ export function isSignal(thing) {
 	return !!thing?.isSignal;
 }
 
+export function delay(duration) {
+	return new Promise(r => setTimeout(r, duration));
+}
+
 export function cancel(signal, reason) {
 	if (signal.cancel) {
 		signal.cancel(reason);

@@ -14,8 +14,16 @@ const getCoords = (e) => {
 	return {x: e.clientX - bounds.x, y: e.clientY - bounds.y};
 };
 
-async function main() {
-	while (true) {
+let mode = 'pencil';
+document.querySelectorAll('.mode').forEach(el => {
+	el.addEventListener('click', () => {
+		mode = el.dataset.mode;
+		A.cancel(whenCanvas);
+	});
+});
+
+const modes = {
+	async pencil() {
 		let pt1, pt2;
 		const e = await whenCanvas('pointerdown');
 		e.target.setPointerCapture(e.pointerId);
@@ -31,6 +39,30 @@ async function main() {
 			ctx.stroke();
 			pt1 = pt2;
 		}
+	},
+	async rectangle() {
+		let pt1, pt2;
+		const e = await whenCanvas('pointerdown');
+		e.target.setPointerCapture(e.pointerId);
+		pt1 = getCoords(e);
+
+		while (true) {
+			const e = await Promise.any([whenCanvas('pointermove'), whenCanvas('pointerup')]);
+			if (e.type == 'pointerup') break;
+			pt2 = getCoords(e);
+		}
+		ctx.fillRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
+	}
+};
+
+async function main() {
+	while (true) {
+		try {
+			await modes[mode]();
+ 		} catch (e) {
+			console.log("err", e);
+		}
+		await A.delay(0); // to prevent freezing the browser
 	}
 }
 
