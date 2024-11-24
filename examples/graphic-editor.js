@@ -55,15 +55,6 @@ const modes = {
 	}
 };
 
-async function main() {
-	while (true) {
-		try {
-			await modes[mode]();
- 		} catch (e) {
-			console.log("err", e);
-		}
-		await A.delay(0); // to prevent freezing the browser
-	}
-}
-
-main();
+A.loop(async () => {
+	await modes[mode]();
+});

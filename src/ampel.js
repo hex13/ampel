@@ -10,6 +10,17 @@ export function delay(duration) {
 	return new Promise(r => setTimeout(r, duration));
 }
 
+export async function loop(f) {
+	while (true) {
+		try {
+			await f();
+		} catch (e) {
+			console.log("err", e);
+		}
+		await delay(0); // to prevent freezing the browser
+	}
+}
+
 export function cancel(signal, reason) {
 	if (signal.cancel) {
 		signal.cancel(reason);
