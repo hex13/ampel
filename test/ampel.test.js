@@ -171,7 +171,7 @@ describe('Ampel', () => {
 
 		assert.strictEqual(foo.cancelled, false);
 		assert.strictEqual(bar.cancelled, false);
-		multiSignal.cancel();
+		A.cancel(multiSignal);
 		assert.strictEqual(foo.cancelled, true);
 		assert.strictEqual(bar.cancelled, true);
 	});

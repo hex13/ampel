@@ -9,8 +9,8 @@ export function isSignal(thing) {
 export function cancel(signal, reason) {
 	if (signal.cancel) {
 		signal.cancel(reason);
-	} else if (signal && typeof signal == 'object') {
-		Object.values(signal).forEach(s => s.cancel());
+	} else {
+		Object.values(signal.signals || signal).forEach(s => s.cancel());
 	}
 }
 
@@ -44,19 +44,14 @@ export function Signal(initial) {
 }
 
 export function MultiSignal(subscribe) {
-	const signals = Object.create(null);
 	const ms = (eventType) => {
-		if (signals[eventType] && !signals[eventType].cancelled) return signals[eventType];
+		if (ms.signals[eventType] && !ms.signals[eventType].cancelled) return ms.signals[eventType];
 		const s = Signal();
 		subscribe(eventType, s);
-		signals[eventType] = s;
+		ms.signals[eventType] = s;
 		return s;
 	};
-	ms.cancel = () => {
-		Object.values(signals).forEach(s => {
-			cancel(s);
-		});
-	};
+	ms.signals = Object.create(null);
 	return ms;
 }
 
@@ -67,4 +62,3 @@ export function fromEventTarget(target) {
 		});
 	});
 }
-
