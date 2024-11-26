@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { State, DELTAS, on, once } from '../src/state2.js';
+import { State, DELTAS, on, once } from '../src/experiments/state2.js';
 
 const sleep = () => {
     return new Promise(r => setTimeout(r, 0));
