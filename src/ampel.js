@@ -108,3 +108,13 @@ export async function* map(mapper, it) {
 	}
 }
 
+
+export async function* pairs(it) {
+	let last;
+	for await (const value of it) {
+		if (last != undefined) {
+			yield [last, value];
+		}
+		last = value;
+	}
+}

@@ -23,15 +23,11 @@ document.querySelectorAll('.mode').forEach(el => {
 });
 
 async function pencil(when) {
-	let last;
-	for await (const curr of A.map(getCoords, A.drag(when))) {
-		if (last) {
-			ctx.beginPath();
-			ctx.moveTo(curr.x, curr.y);
-			ctx.lineTo(last.x, last.y);
-			ctx.stroke();
-		}
-		last = curr;
+	for await (const [last, curr] of A.pairs(A.map(getCoords, A.drag(when)))) {
+		ctx.beginPath();
+		ctx.moveTo(curr.x, curr.y);
+		ctx.lineTo(last.x, last.y);
+		ctx.stroke();
 	}
 }
 
