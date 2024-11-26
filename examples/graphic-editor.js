@@ -24,8 +24,7 @@ document.querySelectorAll('.mode').forEach(el => {
 
 async function pencil(when) {
 	let last;
-	for await (const e of A.drag(when)) {
-		const curr = getCoords(e);
+	for await (const curr of A.map(getCoords, A.drag(when))) {
 		if (last) {
 			ctx.beginPath();
 			ctx.moveTo(curr.x, curr.y);
@@ -38,8 +37,7 @@ async function pencil(when) {
 
 async function rectangle(when) {
 	let pt1, pt2;
-	for await (const e of A.drag(when)) {
-		const curr = getCoords(e);
+	for await (const curr of A.map(getCoords, A.drag(when))) {
 		if (!pt1) pt1 = curr;
 		pt2 = curr;
 	}

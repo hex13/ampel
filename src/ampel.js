@@ -10,6 +10,7 @@ export function delay(duration) {
 	return new Promise(r => setTimeout(r, duration));
 }
 
+
 export async function loop(f) {
 	while (true) {
 		try {
@@ -100,3 +101,10 @@ export function fromEventTarget(target) {
 		});
 	});
 }
+
+export async function* map(mapper, it) {
+	for await (const value of it) {
+		yield mapper(value);
+	}
+}
+
