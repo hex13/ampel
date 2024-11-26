@@ -1,10 +1,13 @@
 import * as assert from 'node:assert';
 import * as A from '../src/ampel.js';
 
+const getValue = (s) => s();
+const setValue = (s, v) => s(v);
+
 describe('Ampel', () => {
 	it('initial state', () => {
 		const s = new A.Signal(123);
-		assert.strictEqual(s(), 123);
+		assert.strictEqual(getValue(s), 123);
 	});
 	it('isSignal()', () => {
 		const s = new A.Signal();
@@ -16,8 +19,8 @@ describe('Ampel', () => {
 
 	it('set & get', () => {
 		const s = new A.Signal(123);
-		s(456);
-		assert.strictEqual(s(), 456);
+		setValue(s, 456);
+		assert.strictEqual(getValue(s), 456);
 	});
 
 	it('subscribing', async () => {
@@ -28,8 +31,8 @@ describe('Ampel', () => {
 			calls.push(args);
 		});
 
-		s(456);
-		s(789);
+		setValue(s, 456);
+		setValue(s, 789);
 
 		assert.deepStrictEqual(calls, [
 			[456],
@@ -49,11 +52,11 @@ describe('Ampel', () => {
 			calls.push(['then2', v]);
 		});
 
-		s('something');
+		setValue(s, 'something');
 		s.then((v) => {
 			calls.push(['then3', v]);
 		});
-		s('something else');
+		setValue(s, 'something else');
 
 		assert.deepStrictEqual(calls, [
 			['then1', 'something'],
@@ -62,7 +65,7 @@ describe('Ampel', () => {
 		]);
 
 		setTimeout(() => {
-			s('something different');
+			setValue(s, 'something different');
 		}, 0);
 
 		assert.strictEqual(await s, 'something different');
@@ -70,22 +73,22 @@ describe('Ampel', () => {
 
 	it('cancellation should prevent for setting new value', async () => {
 		const calls = [];
-		const s = A.Signal();
+		const s = new A.Signal();
 		A.subscribe(s, (v) => {
 			calls.push(v);
 		});
-		s(123);
-		s(456);
+		setValue(s, 123);
+		setValue(s, 456);
 		const error = {text: 'some error'};
 		A.cancel(s, error);
-		s(789);
+		setValue(s, 789);
 
-		assert.strictEqual(s(), 456);
+		assert.strictEqual(getValue(s), 456);
 	});
 
 	it('cancellation should propagate erros', async () => {
 		const values = [];
-		const s = A.Signal();
+		const s = new A.Signal();
 
 		setTimeout(() => {
 			A.cancel(s, {text: 'Nevermore'});
@@ -101,8 +104,8 @@ describe('Ampel', () => {
 
 	it('A.cancel(): cancelling multiple signals at once when given object of signals', async () => {
 		const o = {
-			foo: A.Signal(),
-			bar: A.Signal(),
+			foo: new A.Signal(),
+			bar: new A.Signal(),
 		};
 		assert.strictEqual(o.foo.cancelled, false);
 		assert.strictEqual(o.bar.cancelled, false);
@@ -179,8 +182,8 @@ describe('Ampel', () => {
 	it('cancelling object of signals should pass reason to these signals', async () => {
 		const errors = {};
 		const signals = {
-			foo: A.Signal(),
-			bar: A.Signal(),
+			foo: new A.Signal(),
+			bar: new A.Signal(),
 		};
 		setTimeout(() => {
 			A.cancel(signals, {text: 'Nevermore.'});
