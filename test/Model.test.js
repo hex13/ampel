@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { Model, createDepsGatherer } from '../src/Model.js';
+import { Model, createDepsGatherer } from '../src/experiments/Model.js';
 
 const notify = (events, name) => (...args) => {
 	events.push([name, ...args]);
