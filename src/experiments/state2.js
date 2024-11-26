@@ -24,6 +24,9 @@ export function State(obj, opts = {}) {
 		get(target, prop) {
 			if (prop == DELTAS) return deltas;
 			if (prop == LISTENERS) return listeners;
+			if (typeof prop == 'string' && typeof target['$' + prop] == 'function') {
+				return target['$' + prop]();
+			}
 			return target[prop];
 		},
 		set(target, prop, value) {
