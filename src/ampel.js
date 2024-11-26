@@ -59,6 +59,14 @@ export function Signal(initial) {
 	return s;
 }
 
+export function fromPromise(promise) {
+	const s = Signal();
+	promise.then(v => {
+		s(v);
+	});
+	return s;
+}
+
 export async function* takeUntil(when, until) {
 	let ended = false;
 	while (!ended) {
