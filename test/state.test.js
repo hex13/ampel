@@ -1,7 +1,7 @@
 import * as assert from 'node:assert';
 
-import { on, MULTISIGNAL } from '../src/signal.js';
-import { State, onProp } from '../src/state.js';
+import { on, MULTISIGNAL } from '../src/experiments/signal.js';
+import { State, onProp } from '../src/experiments/state.js';
 
 describe('State', () => {
 	it('has initial data', () => {

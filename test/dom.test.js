@@ -1,6 +1,6 @@
 import * as assert from 'node:assert';
-import { mount, jsx } from '../src/dom.js';
-import { Signal, set } from '../src/signal.js';
+import { mount, jsx } from '../src/experiments/dom.js';
+import { Signal, set } from '../src/experiments/signal.js';
 import jsdom from 'jsdom';
 const { JSDOM } = jsdom;
 
