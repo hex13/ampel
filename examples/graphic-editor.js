@@ -22,27 +22,31 @@ document.querySelectorAll('.mode').forEach(el => {
 	});
 });
 
+async function pencil(when) {
+	for await (const { curr, last } of A.drag(when, getCoords)) {
+		if (last) {
+			ctx.beginPath();
+			ctx.moveTo(curr.x, curr.y);
+			ctx.lineTo(last.x, last.y);
+			ctx.stroke();
+		}
+	}
+}
+
+async function rectangle(when) {
+	let pt1, pt2;
+	for await (const { curr, last } of A.drag(when, getCoords)) {
+		if (!pt1) pt1 = curr;
+		pt2 = curr;
+	}
+	ctx.fillRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
+}
+
 const modes = {
-	async pencil() {
-		for await (const { curr, last } of A.drag(whenCanvas, getCoords)) {
-			if (last) {
-				ctx.beginPath();
-				ctx.moveTo(curr.x, curr.y);
-				ctx.lineTo(last.x, last.y);
-				ctx.stroke();
-			}
-		}
-	},
-	async rectangle() {
-		let pt1, pt2;
-		for await (const { curr, last } of A.drag(whenCanvas, getCoords)) {
-			if (!pt1) pt1 = curr;
-			pt2 = curr;
-		}
-		ctx.fillRect(pt1.x, pt1.y, pt2.x - pt1.x, pt2.y - pt1.y);
-	},
+	pencil, rectangle,
 };
 
 A.loop(async () => {
-	await modes[mode]();
+	await modes[mode](whenCanvas);
 });
+//61; 49
