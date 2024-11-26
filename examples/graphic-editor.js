@@ -23,19 +23,23 @@ document.querySelectorAll('.mode').forEach(el => {
 });
 
 async function pencil(when) {
-	for await (const { curr, last } of A.drag(when, getCoords)) {
+	let last;
+	for await (const e of A.drag(when)) {
+		const curr = getCoords(e);
 		if (last) {
 			ctx.beginPath();
 			ctx.moveTo(curr.x, curr.y);
 			ctx.lineTo(last.x, last.y);
 			ctx.stroke();
 		}
+		last = curr;
 	}
 }
 
 async function rectangle(when) {
 	let pt1, pt2;
-	for await (const { curr, last } of A.drag(when, getCoords)) {
+	for await (const e of A.drag(when)) {
+		const curr = getCoords(e);
 		if (!pt1) pt1 = curr;
 		pt2 = curr;
 	}
