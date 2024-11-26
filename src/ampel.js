@@ -60,14 +60,14 @@ export class Signal {
 			l.reject && l.reject(reason);
 		});
 	}
-}
+	static fromPromise(promise) {
+		const s = new Signal();
+		promise.then(v => {
+			s(v);
+		});
+		return s;
+	}
 
-export function fromPromise(promise) {
-	const s = Signal();
-	promise.then(v => {
-		s(v);
-	});
-	return s;
 }
 
 export async function* takeUntil(when, until) {
