@@ -30,33 +30,36 @@ export function cancel(signal, reason) {
 	}
 }
 
-export function Signal(initial) {
-	let value = initial;
-	let listeners = [];
-	const s = (...args) => {
-		if (args.length == 0) return value;
-		if (s.cancelled) return;
-		value = args[0];
-		listeners = listeners.filter(({ cb, once }) => {
+export class Signal {
+	isSignal = true;
+	listeners = [];
+	cancelled = false;
+	constructor(initial) {
+		this.value = initial;
+	}
+	get() {
+		return this.value;
+	}
+	set(value) {
+		if (this.cancelled) return;
+		this.value = value;
+		this.listeners = this.listeners.filter(({ cb, once }) => {
 			cb(value);
 			return !once;
 		});
-	};
-	s.isSignal = true;
-	s.subscribe = (cb) => {
-		listeners.push({ cb });
-	};
-	s.then = (cb, reject) => {
-		listeners.push({ cb, reject, once: true });
-	};
-	s.cancel = (reason) => {
-		s.cancelled = true;
-		listeners.forEach(l => {
+	}
+	subscribe(cb) {
+		this.listeners.push({ cb });
+	}
+	then(cb, reject) {
+		this.listeners.push({ cb, reject, once: true });
+	}
+	cancel(reason) {
+		this.cancelled = true;
+		this.listeners.forEach(l => {
 			l.reject && l.reject(reason);
 		});
-	};
-	s.cancelled = false;
-	return s;
+	}
 }
 
 export function fromPromise(promise) {
@@ -93,7 +96,7 @@ export async function* drag(on) {
 export function MultiSignal(subscribe) {
 	const ms = (eventType) => {
 		if (ms.signals[eventType] && !ms.signals[eventType].cancelled) return ms.signals[eventType];
-		const s = Signal();
+		const s = new Signal();
 		subscribe(eventType, s);
 		ms.signals[eventType] = s;
 		return s;
@@ -105,7 +108,7 @@ export function MultiSignal(subscribe) {
 export function fromEventTarget(target) {
 	return MultiSignal((eventType, s) => {
 		target.addEventListener(eventType, (v) => {
-			s(v);
+			s.set(v);
 		});
 	});
 }

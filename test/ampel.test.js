@@ -1,13 +1,14 @@
 import * as assert from 'node:assert';
 import * as A from '../src/ampel.js';
 
-const getValue = (s) => s();
-const setValue = (s, v) => s(v);
+const getValue = (s) => s.get();
+const setValue = (s, v) => s.set(v);
 
 describe('Ampel', () => {
 	it('initial state', () => {
 		const s = new A.Signal(123);
 		assert.strictEqual(getValue(s), 123);
+		assert.strictEqual(s.cancelled, false);
 	});
 	it('isSignal()', () => {
 		const s = new A.Signal();
