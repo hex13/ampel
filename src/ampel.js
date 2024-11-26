@@ -58,16 +58,27 @@ export function Signal(initial) {
 	return s;
 }
 
+export async function* takeUntil(when, until, mapper = x => x) {
+	let ended = false;
+	while (!ended) {
+		const e = await Promise.any([
+			when,
+			Promise.resolve(until).then(e => {
+				ended = true;
+				return e;
+			}),
+		]);
+		yield mapper(e);
+	}
+}
+
 export async function* drag(on, mapper = x => x) {
 	let last;
 	const e = await on('pointerdown');
 	e.target.setPointerCapture(e.pointerId);
 	yield { curr: mapper(e) };
-	while (true) {
-		const e = await Promise.any([on('pointermove'), on('pointerup')]);
-		const curr = mapper(e);
+	for await (const curr of takeUntil(on('pointermove'), on('pointerup'), mapper)) {
 		yield { curr, last };
-		if (e.type == 'pointerup') break;
 		last = curr;
 	}
 }
