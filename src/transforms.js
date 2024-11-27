@@ -4,6 +4,14 @@ export async function* map(mapper, it) {
 	}
 }
 
+export async function* filter(f, it) {
+	for await (const value of it) {
+		if (f(value)) {
+			yield value;
+		}
+	}
+}
+
 export async function* pairs(it) {
 	let last;
 	for await (const value of it) {

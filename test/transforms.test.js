@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { map, pairs } from '../src/transforms.js';
+import { map, filter, pairs } from '../src/transforms.js';
 
 async function* foo() {
 	await Promise.resolve();
@@ -19,6 +19,13 @@ describe('transforms', () => {
 			values.push(v);
 		}
 		assert.deepStrictEqual(values, [134, 901, 19, 20]);
+	});
+	it('filter()', async () => {
+		const values = [];
+		for await (const v of filter(x => x < 100, foo())) {
+			values.push(v);
+		}
+		assert.deepStrictEqual(values, [9, 10]);
 	});
 	it('pairs()', async () => {
 		const values = [];
