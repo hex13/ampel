@@ -1,9 +1,15 @@
+import { Signal } from './Signal.js';
+
+export { Signal } from './Signal.js';
 export * from './transforms.js';
+
 
 export function subscribe(signal, cb) {
 	signal.subscribe(cb);
 }
 
+
+// TODO: move isSignal to Signal class as static method
 export function isSignal(thing) {
 	return !!thing?.isSignal;
 }
@@ -32,46 +38,7 @@ export function cancel(signal, reason) {
 	}
 }
 
-export class Signal {
-	isSignal = true;
-	listeners = [];
-	cancelled = false;
-	constructor(initial) {
-		this.value = initial;
-	}
-	get() {
-		return this.value;
-	}
-	set(value) {
-		if (this.cancelled) return;
-		this.value = value;
-		this.listeners = this.listeners.filter(({ cb, once }) => {
-			cb(value);
-			return !once;
-		});
-	}
-	subscribe(cb) {
-		this.listeners.push({ cb });
-	}
-	then(cb, reject) {
-		this.listeners.push({ cb, reject, once: true });
-	}
-	cancel(reason) {
-		this.cancelled = true;
-		this.listeners.forEach(l => {
-			l.reject && l.reject(reason);
-		});
-	}
-	static fromPromise(promise) {
-		const s = new Signal();
-		promise.then(v => {
-			s(v);
-		});
-		return s;
-	}
-
-}
-
+// TODO: move takeUntil to Signal class
 export async function* takeUntil(when, until) {
 	let ended = false;
 	while (!ended) {
