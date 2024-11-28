@@ -5,7 +5,7 @@ import {
 	get, set, on, off, once,
 	map, computed, detach,
 	invalidate,
-} from '../src/experiments/signal.js';
+} from '../signal.js';
 
 const State = Signal;
 
