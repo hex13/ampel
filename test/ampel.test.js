@@ -118,11 +118,11 @@ describe('Ampel', () => {
 	it('fromEventTarget', async () => {
 		const calls = [];
 		const target = new EventTarget();
-		const getSignal = A.fromEventTarget(target);
-		A.subscribe(getSignal('foo'), v => {
+		const listener = A.Listener.fromEventTarget(target);
+		A.subscribe(listener.on('foo'), v => {
 			calls.push(['foo', v?.type, v?.abc]);
 		});
-		A.subscribe(getSignal('bar'), v => {
+		A.subscribe(listener.on('bar'), v => {
 			calls.push(['bar', v?.type, v?.abc]);
 		});
 		let e;
@@ -141,11 +141,11 @@ describe('Ampel', () => {
 
 	it('fromEventTarget: caching', async () => {
 		const target = new EventTarget();
-		const getSignal = A.fromEventTarget(target);
+		const listener = A.Listener.fromEventTarget(target);
 		let foo1, foo2, bar;
-		foo1 = getSignal('foo');
-		foo2 = getSignal('foo');
-		bar = getSignal('bar');
+		foo1 = listener.on('foo');
+		foo2 = listener.on('foo');
+		bar = listener.on('bar');
 		[foo1, foo2, bar].forEach(s => {
 			assert.ok(s);
 			assert.ok(A.isSignal(s));
@@ -156,12 +156,12 @@ describe('Ampel', () => {
 
 	it('fromEventTarget: after cancellation should recreate signal', async () => {
 		const target = new EventTarget();
-		const getSignal = A.fromEventTarget(target);
+		const listener = A.Listener.fromEventTarget(target);
 		let foo1, foo2, foo3;
-		foo1 = getSignal('foo');
-		foo2 = getSignal('foo');
+		foo1 = listener.on('foo');
+		foo2 = listener.on('foo');
 		A.cancel(foo1);
-		foo3 = getSignal('foo');
+		foo3 = listener.on('foo');
 
 		assert.strictEqual(foo1, foo2);
 		assert.notStrictEqual(foo1, foo3);
@@ -170,8 +170,8 @@ describe('Ampel', () => {
 	it('Listener: cancelling multiple signals at once', async () => {
 		const target = new EventTarget();
 		const listener = new A.Listener(() => {});
-		const foo = listener('foo');
-		const bar = listener('foo');
+		const foo = listener.on('foo');
+		const bar = listener.on('foo');
 
 		assert.strictEqual(foo.cancelled, false);
 		assert.strictEqual(bar.cancelled, false);

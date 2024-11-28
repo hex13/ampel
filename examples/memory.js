@@ -8,7 +8,7 @@ async function main() {
 	const container = document.createElement('div');
 	container.style.position = 'relative';
 	document.body.append(container);
-	const whenButton = A.fromEventTarget(container);
+	const whenButton = A.Listener.fromEventTarget(container).on;
 
 	while (true) {
 		const numbers = [];

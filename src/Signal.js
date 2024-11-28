@@ -31,7 +31,7 @@ export class Signal {
 	static fromPromise(promise) {
 		const s = new Signal();
 		promise.then(v => {
-			s(v);
+			s.set(v);
 		});
 		return s;
 	}
