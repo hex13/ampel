@@ -1,9 +1,9 @@
 import { Signal } from './Signal.js';
 
 export class ProxyState {
-	innerState = {};
 	changes = new Signal();
-	constructor() {
+	constructor(initial = {}) {
+		this.innerState = initial;
 		let timeout;
 		this.state = new Proxy(this.innerState, {
 			set: (target, prop, value) => {

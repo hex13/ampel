@@ -1,6 +1,7 @@
 import { Signal } from './Signal.js';
 
 export { Signal } from './Signal.js';
+export { ProxyState } from './ProxyState.js';
 export * from './transforms.js';
 
 

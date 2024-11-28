@@ -5,8 +5,15 @@ import * as A from '../src/ampel.js';
 
 describe('ProxyState', () => {
 	it('initial state', () => {
-		const ps = new ProxyState();
+		let ps;
+		ps = new ProxyState();
 		assert.deepStrictEqual(ps.state, {});
+		assert.ok(ps.changes instanceof Signal);
+
+		const initialState = {foo: 120, bar: 1};
+		ps = new ProxyState(initialState);
+		assert.deepStrictEqual(ps.state, {foo: 120, bar: 1});
+		assert.strictEqual(ps.innerState, initialState);
 		assert.ok(ps.changes instanceof Signal);
 	});
 
