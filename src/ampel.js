@@ -62,11 +62,11 @@ export async function* drag(on) {
 	}
 }
 
-export function MultiSignal(subscribe) {
+export function Listener(listen) {
 	const ms = (eventType) => {
 		if (ms.signals[eventType] && !ms.signals[eventType].cancelled) return ms.signals[eventType];
 		const s = new Signal();
-		subscribe(eventType, s);
+		listen(eventType, s);
 		ms.signals[eventType] = s;
 		return s;
 	};
@@ -75,7 +75,7 @@ export function MultiSignal(subscribe) {
 }
 
 export function fromEventTarget(target) {
-	return MultiSignal((eventType, s) => {
+	return new Listener((eventType, s) => {
 		target.addEventListener(eventType, (v) => {
 			s.set(v);
 		});

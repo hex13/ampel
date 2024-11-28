@@ -167,15 +167,15 @@ describe('Ampel', () => {
 		assert.notStrictEqual(foo1, foo3);
 	});
 
-	it('MultiSignal: cancelling multiple signals at once', async () => {
+	it('Listener: cancelling multiple signals at once', async () => {
 		const target = new EventTarget();
-		const multiSignal = A.MultiSignal(() => {});
-		const foo = multiSignal('foo');
-		const bar = multiSignal('foo');
+		const listener = new A.Listener(() => {});
+		const foo = listener('foo');
+		const bar = listener('foo');
 
 		assert.strictEqual(foo.cancelled, false);
 		assert.strictEqual(bar.cancelled, false);
-		A.cancel(multiSignal);
+		A.cancel(listener);
 		assert.strictEqual(foo.cancelled, true);
 		assert.strictEqual(bar.cancelled, true);
 	});
