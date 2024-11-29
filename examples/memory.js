@@ -3,6 +3,7 @@ import * as A from '../src/ampel.js';
 const width = 5;
 const height = 4;
 const buttonSize = 50;
+const isButton = (el) => el.tagName.toLowerCase() == 'button';
 
 async function main() {
 	const container = document.createElement('div');
@@ -34,18 +35,16 @@ async function main() {
 		}
 
 		while (buttonsLeft > 0) {
-			let first, second;
-			first = (await whenButton('click')).target;
+			const first = (await whenButton('click').filter(e => isButton(e.target))).target;
 			const firstValue = first.dataset.value;
 			first.innerText = firstValue;
 
-			do {
-				second = (await whenButton('click')).target;
-			} while (second == first)
-
+			const second = (await whenButton('click').filter(e => isButton(e.target) && e.target != first)).target;
 			const secondValue = second.dataset.value;
 			second.innerText = secondValue;
+
 			await A.delay(500);
+
 			if (firstValue == secondValue) {
 				first.remove();
 				second.remove();
@@ -60,4 +59,3 @@ async function main() {
 }
 
 main();
-
