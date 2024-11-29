@@ -22,6 +22,23 @@ export class Signal {
 	then(cb, reject) {
 		this.listeners.push({ cb, reject, once: true });
 	}
+	transform(f) {
+		const s = new Signal();
+		this.subscribe(v => {
+			f(s, v);
+		});
+		return s;
+	}
+	map(f) {
+		return this.transform((s, v) => {
+			s.set(f(v));
+		});
+	}
+	filter(f) {
+		return this.transform((s, v) => {
+			if (f(v)) s.set(v);
+		});
+	}
 	cancel(reason) {
 		this.cancelled = true;
 		this.listeners.forEach(l => {

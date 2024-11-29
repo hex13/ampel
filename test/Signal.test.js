@@ -4,6 +4,8 @@ import * as A from '../src/ampel.js';
 const getValue = (s) => s.get();
 const setValue = (s, v) => s.set(v);
 
+const { Signal } = A;
+
 describe('Signal', () => {
 	it('initial state', () => {
 		const s = new A.Signal(123);
@@ -75,6 +77,63 @@ describe('Signal', () => {
 		}, 0);
 
 		assert.strictEqual(await s, 'something different');
+	});
+
+	it('.transform()', async () => {
+		const a = new Signal();
+		const b = a.transform((s, v) => {
+			assert.strictEqual(s, b);
+			s.set(v);
+			s.set(v + 1);
+		});
+
+		assert.ok(b instanceof Signal);
+		assert.notStrictEqual(b, a);
+
+		const values = [];
+		b.subscribe(v => {
+			values.push(v);
+		})
+		a.set(1);
+		a.set(13);
+		a.set(-2);
+		assert.deepStrictEqual(values, [1, 2, 13, 14, -2, -1]);
+	});
+
+	it('.map()', async () => {
+		const a = new Signal();
+		const b = a.map(x => x * 3);
+
+		assert.ok(b instanceof Signal);
+		assert.notStrictEqual(b, a);
+
+		const values = [];
+		b.subscribe(v => {
+			values.push(v);
+		})
+		a.set(1);
+		a.set(13);
+		a.set(-2);
+		assert.deepStrictEqual(values, [3, 39, -6]);
+	});
+
+	it('.filter()', async () => {
+		const a = new Signal();
+		const b = a.filter(x => x % 2 == 1);
+
+		assert.ok(b instanceof Signal);
+		assert.notStrictEqual(b, a);
+
+		const values = [];
+		b.subscribe(v => {
+			values.push(v);
+		})
+		a.set(1);
+		a.set(2);
+		a.set(4);
+		a.set(7);
+		a.set(11);
+		assert.deepStrictEqual(values, [1, 7, 11]);
 	});
 
 	it('cancellation should prevent for setting new value', async () => {
