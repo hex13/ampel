@@ -8,7 +8,7 @@ describe('Ampel', () => {
 	it('fromEventTarget', async () => {
 		const calls = [];
 		const target = new EventTarget();
-		const listener = A.Listener.fromEventTarget(target);
+		const listener = new A.Listener(target);
 		A.subscribe(listener.on('foo'), v => {
 			calls.push(['foo', v?.type, v?.abc]);
 		});
@@ -31,7 +31,7 @@ describe('Ampel', () => {
 
 	it('fromEventTarget: caching', async () => {
 		const target = new EventTarget();
-		const listener = A.Listener.fromEventTarget(target);
+		const listener = new A.Listener(target);
 		let foo1, foo2, bar;
 		foo1 = listener.on('foo');
 		foo2 = listener.on('foo');
@@ -46,7 +46,7 @@ describe('Ampel', () => {
 
 	it('fromEventTarget: after cancellation should recreate signal', async () => {
 		const target = new EventTarget();
-		const listener = A.Listener.fromEventTarget(target);
+		const listener = new A.Listener(target);
 		let foo1, foo2, foo3;
 		foo1 = listener.on('foo');
 		foo2 = listener.on('foo');
@@ -59,7 +59,9 @@ describe('Ampel', () => {
 
 	it('Listener: cancelling multiple signals at once', async () => {
 		const target = new EventTarget();
-		const listener = new A.Listener(() => {});
+		const listener = new A.Listener({
+			addEventListener() {},
+		});
 		const foo = listener.on('foo');
 		const bar = listener.on('foo');
 

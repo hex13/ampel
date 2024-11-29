@@ -7,7 +7,7 @@ canvas.style.border = '1px solid red';
 document.body.append(canvas);
 const ctx = canvas.getContext('2d');
 
-const canvasListener = A.Listener.fromEventTarget(canvas);
+const canvasListener = new A.Listener(canvas);
 
 const getCoords = (e) => {
 	const bounds = e.target.getBoundingClientRect();

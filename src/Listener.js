@@ -8,22 +8,20 @@ export class Listener {
 		this.signals[eventType] = s;
 		return s;
 	}
+	listen(eventType, s) {
+		this.target.addEventListener(eventType, (e) => {
+			this.signal.set(e);
+		});
+	}
 	getSignal(eventType) {
 		if (this.signals[eventType] && !this.signals[eventType].cancelled) return this.signals[eventType];
 		return new Signal();
 	}
-	constructor(listen, signal = new Signal()) {
-		this.listen = listen;
+	constructor(target, signal = new Signal()) {
+		this.target = target;
 		signal.subscribe(e => {
 			this.getSignal(e.type).set(e);
 		});
 		this.signal = signal;
-	}
-	static fromEventTarget(target) {
-		return new Listener(function (eventType, s) {
-			target.addEventListener(eventType, (e) => {
-				this.signal.set(e);
-			});
-		});
 	}
 }
