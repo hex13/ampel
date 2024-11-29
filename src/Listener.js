@@ -3,20 +3,26 @@ import { Signal } from './Signal.js';
 export class Listener {
 	signals = Object.create(null);
 	on = (eventType) => {
-		if (this.signals[eventType] && !this.signals[eventType].cancelled) return this.signals[eventType];
-		const s = new Signal();
+		const s = this.getSignal(eventType);
 		this.listen(eventType, s);
 		this.signals[eventType] = s;
 		return s;
 	}
-
-	constructor(listen) {
+	getSignal(eventType) {
+		if (this.signals[eventType] && !this.signals[eventType].cancelled) return this.signals[eventType];
+		return new Signal();
+	}
+	constructor(listen, signal = new Signal()) {
 		this.listen = listen;
+		signal.subscribe(e => {
+			this.getSignal(e.type).set(e);
+		});
+		this.signal = signal;
 	}
 	static fromEventTarget(target) {
-		return new Listener((eventType, s) => {
-			target.addEventListener(eventType, (v) => {
-				s.set(v);
+		return new Listener(function (eventType, s) {
+			target.addEventListener(eventType, (e) => {
+				this.signal.set(e);
 			});
 		});
 	}
