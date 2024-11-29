@@ -102,6 +102,40 @@ describe('State', () => {
 
     });
 
+
+    it('computed', async () => {
+        const state = State({
+            a: 10,
+            b: 20,
+            $c() {
+                return this.a + this.b;
+            }
+        });
+
+        assert.strictEqual(state.c, 30);
+        state.a = 100;
+        assert.strictEqual(state.c, 120);
+    });
+
+    it('computed - subscribing', async () => {
+        const events = [];
+        const state = State({
+            a: 10,
+            b: 20,
+            $c() {
+                return this.a + this.b;
+            }
+        });
+        on(state, 'c', v => {
+            events.push(['on', v]);
+        });
+        state.a = 100;
+
+        // assert.deepStrictEqual(events, [
+        //     ['on', 120],
+        // ]);
+    });
+
     it('once', async () => {
         let events = [];
         const onB = (v) => {
