@@ -67,7 +67,7 @@ async function main() {
 }
 main();
 ```
-It's usually not needed to manually create Listener like above because Listener has static method `fromEventTarget` which does exactly that (i.e. allows for listening to DOM elements or other objects that implement addEventListener method).
+~~It's usually not needed to manually create Listener like above because Listener has static method `fromEventTarget` which does exactly that (i.e. allows for listening to DOM elements or other objects that implement addEventListener method).~~
 
 example:
 ```js
