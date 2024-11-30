@@ -1,5 +1,6 @@
 import * as assert from 'node:assert';
 import * as A from '../src/ampel.js';
+import * as sinon from 'sinon';
 
 const getValue = (s) => s.get();
 const setValue = (s, v) => s.set(v);
@@ -32,45 +33,35 @@ describe('Signal', () => {
 	});
 
 	it('subscribing', async () => {
-		const calls = [];
 		const s = new A.Signal(123);
-
-		A.subscribe(s, (...args) => {
-			calls.push(args);
-		});
+		const spy = sinon.spy();
+		A.subscribe(s, spy);
 
 		setValue(s, 456);
 		setValue(s, 789);
 
-		assert.deepStrictEqual(calls, [
+		assert.deepStrictEqual(spy.args, [
 			[456],
 			[789],
 		]);
 	});
 
 	it('state is thenable', async () => {
-		const calls = [];
 		const s = new A.Signal(123);
+		const then1 = sinon.spy();
+		const then2 = sinon.spy();
+		const then3 = sinon.spy();
 
-		s.then((v) => {
-			calls.push(['then1', v]);
-		});
-
-		s.then((v) => {
-			calls.push(['then2', v]);
-		});
-
+		s.then(then1);
+		s.then(then2);
 		setValue(s, 'something');
-		s.then((v) => {
-			calls.push(['then3', v]);
-		});
+
+		s.then(then3);
 		setValue(s, 'something else');
 
-		assert.deepStrictEqual(calls, [
-			['then1', 'something'],
-			['then2', 'something'],
-			['then3', 'something else'],
-		]);
+		assert.deepStrictEqual(then1.args, [['something']]);
+		assert.deepStrictEqual(then2.args, [['something']]);
+		assert.deepStrictEqual(then3.args, [['something else']]);
 
 		setTimeout(() => {
 			setValue(s, 'something different');
@@ -137,11 +128,7 @@ describe('Signal', () => {
 	});
 
 	it('cancellation should prevent for setting new value', async () => {
-		const calls = [];
 		const s = new A.Signal();
-		A.subscribe(s, (v) => {
-			calls.push(v);
-		});
 		setValue(s, 123);
 		setValue(s, 456);
 		const error = {text: 'some error'};
@@ -178,5 +165,4 @@ describe('Signal', () => {
 		assert.strictEqual(o.foo.cancelled, true);
 		assert.strictEqual(o.bar.cancelled, true);
 	});
-
 });
