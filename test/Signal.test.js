@@ -220,11 +220,14 @@ describe('Signal', () => {
 		s.root = root;
 		s.doListen = sinon.spy();
 		const onFoo = s.on('foo');
+		const onFoo2 = s.on('foo');
+		assert.strictEqual(onFoo, onFoo2);
+
 		const onBar = on('bar');
 		const fooSpy = sinon.spy();
 		const barSpy = sinon.spy();
-		onFoo.subscribe(fooSpy)
-		onBar.subscribe(barSpy)
+		onFoo.subscribe(fooSpy);
+		onBar.subscribe(barSpy);
 		assert.ok(onFoo instanceof Signal);
 		assert.ok(onBar instanceof Signal);
 		s.set({type: 'foo', a: 1});

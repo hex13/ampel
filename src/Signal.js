@@ -2,9 +2,13 @@ export class Signal {
 	isSignal = true;
 	listeners = [];
 	cancelled = false;
+	eventSignals = Object.create(null);
 	on = (type) => {
+		if (this.eventSignals[type]) return this.eventSignals[type];
 		this.root.doListen(type);
-		return this.filter(v => v.type == type);
+		const s = this.filter(v => v.type == type);
+		this.eventSignals[type] = s;
+		return s;
 	}
 	constructor(initial) {
 		this.value = initial;
