@@ -2,7 +2,6 @@ import { Signal } from './Signal.js';
 
 export { Signal } from './Signal.js';
 export { ProxyState } from './ProxyState.js';
-export { Listener } from './Listener.js';
 export * from './transforms.js';
 
 
