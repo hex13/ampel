@@ -7,8 +7,8 @@ canvas.style.border = '1px solid red';
 document.body.append(canvas);
 const ctx = canvas.getContext('2d');
 
-const canvasListener = new A.Listener(canvas);
 
+let canvasListener = A.Signal.fromEventTarget(canvas);
 const getCoords = (e) => {
 	const bounds = e.target.getBoundingClientRect();
 	return {x: e.clientX - bounds.x, y: e.clientY - bounds.y};
@@ -19,6 +19,7 @@ document.querySelectorAll('.mode').forEach(el => {
 	el.addEventListener('click', () => {
 		mode = el.dataset.mode;
 		A.cancel(canvasListener);
+		canvasListener = A.Signal.fromEventTarget(canvas);
 	});
 });
 
@@ -47,4 +48,3 @@ const modes = {
 A.loop(async () => {
 	await modes[mode](canvasListener.on);
 });
-//61; 49

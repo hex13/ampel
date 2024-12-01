@@ -19,7 +19,7 @@ async function playMemory({ container, render, hideCard, uncoverCard, coverCard 
 
 		render({ container, cards });
 
-		const cardClicked = new A.Listener(container)
+		const cardClicked = A.Signal.fromEventTarget(container)
 			.on('click')
 			.filter((e) => e.target.tagName.toLowerCase() == 'button')
 			.map(e => cards[e.target.dataset.idx]);

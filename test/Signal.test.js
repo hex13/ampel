@@ -17,6 +17,7 @@ describe('Signal', () => {
 		assert.strictEqual(getValue(s), 123);
 		assert.strictEqual(s.cancelled, false);
 		assert.strictEqual(s.root, s);
+		assert.deepStrictEqual(s.derived, []);
 	});
 	it('isSignal()', () => {
 		const s = new A.Signal();
@@ -70,6 +71,24 @@ describe('Signal', () => {
 		assert.strictEqual(await s, 'something different');
 	});
 
+	it('.transform() should set .derived', async () => {
+		const a = new Signal();
+		const b = a.transform(() => {});
+		const c = a.transform(() => {});
+		const d = a.map(() => {});
+		const e = a.map(() => {});
+		const f = a.filter(() => {});
+		const g = a.filter(() => {});
+
+		assert.strictEqual(a.derived.length, 6);
+		assert.strictEqual(a.derived[0], b);
+		assert.strictEqual(a.derived[1], c);
+		assert.strictEqual(a.derived[2], d);
+		assert.strictEqual(a.derived[3], e);
+		assert.strictEqual(a.derived[4], f);
+		assert.strictEqual(a.derived[5], g);
+	});
+
 	it('.transform()', async () => {
 		const a = new Signal();
 		const b = a.transform((s, v) => {
@@ -99,6 +118,8 @@ describe('Signal', () => {
 		assert.ok(b instanceof Signal);
 		assert.notStrictEqual(b, a);
 		assert.strictEqual(b.root, a);
+		assert.strictEqual(a.derived.length, 1);
+		assert.strictEqual(a.derived[0], b);
 
 		const values = [];
 		b.subscribe(v => {
@@ -117,11 +138,13 @@ describe('Signal', () => {
 		assert.ok(b instanceof Signal);
 		assert.notStrictEqual(b, a);
 		assert.strictEqual(b.root, a);
+		assert.strictEqual(a.derived.length, 1);
+		assert.strictEqual(a.derived[0], b);
 
 		const values = [];
 		b.subscribe(v => {
 			values.push(v);
-		})
+		});
 		a.set(1);
 		a.set(2);
 		a.set(4);
@@ -169,15 +192,35 @@ describe('Signal', () => {
 		assert.strictEqual(o.bar.cancelled, true);
 	});
 
+	it('Signal: .cancel() should cancel derived signals', async () => {
+		const a = new Signal();
+		const b = a.transform(x => x);
+		const c = a.filter(x => x);
+		const d = a.map(x => x);
+		const e = a.map(x => x).filter(x => x);
+		assert.strictEqual(a.cancelled, false);
+		assert.strictEqual(b.cancelled, false);
+		assert.strictEqual(c.cancelled, false);
+		assert.strictEqual(d.cancelled, false);
+		assert.strictEqual(e.cancelled, false);
+		a.cancel();
+		assert.strictEqual(a.cancelled, true);
+		assert.strictEqual(b.cancelled, true);
+		assert.strictEqual(c.cancelled, true);
+		assert.strictEqual(d.cancelled, true);
+		assert.strictEqual(e.cancelled, true);
+	});
+
 	it('Signal: .on()', () => {
 		const s = new Signal();
+		const { on } = s; // for testing `this` binding
 		const root = {
 			doListen: sinon.spy(),
 		};
 		s.root = root;
 		s.doListen = sinon.spy();
 		const onFoo = s.on('foo');
-		const onBar = s.on('bar');
+		const onBar = on('bar');
 		const fooSpy = sinon.spy();
 		const barSpy = sinon.spy();
 		onFoo.subscribe(fooSpy)
