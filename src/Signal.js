@@ -49,6 +49,9 @@ export class Signal {
 			s.set(f(v));
 		});
 	}
+	fork() {
+		return this.map(v => v);
+	}
 	filter(f) {
 		return this.transform((s, v) => {
 			if (f(v)) s.set(v);

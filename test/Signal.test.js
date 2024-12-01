@@ -131,6 +131,27 @@ describe('Signal', () => {
 		assert.deepStrictEqual(values, [3, 39, -6]);
 	});
 
+
+	it('.fork()', async () => {
+		const a = new Signal();
+		const b = a.fork();
+
+		assert.ok(b instanceof Signal);
+		assert.notStrictEqual(b, a);
+		assert.strictEqual(b.root, a);
+		assert.strictEqual(a.derived.length, 1);
+		assert.strictEqual(a.derived[0], b);
+
+		const values = [];
+		b.subscribe(v => {
+			values.push(v);
+		})
+		a.set(1);
+		a.set(13);
+		a.set(-2);
+		assert.deepStrictEqual(values, [1, 13, -2]);
+	});
+
 	it('.filter()', async () => {
 		const a = new Signal();
 		const b = a.filter(x => x % 2 == 1);

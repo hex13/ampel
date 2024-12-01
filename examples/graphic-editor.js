@@ -7,8 +7,9 @@ canvas.style.border = '1px solid red';
 document.body.append(canvas);
 const ctx = canvas.getContext('2d');
 
+const canvasListener = A.Signal.fromEventTarget(canvas);
+let interaction;
 
-let canvasListener = A.Signal.fromEventTarget(canvas);
 const getCoords = (e) => {
 	const bounds = e.target.getBoundingClientRect();
 	return {x: e.clientX - bounds.x, y: e.clientY - bounds.y};
@@ -18,8 +19,7 @@ let mode = 'pencil';
 document.querySelectorAll('.mode').forEach(el => {
 	el.addEventListener('click', () => {
 		mode = el.dataset.mode;
-		A.cancel(canvasListener);
-		canvasListener = A.Signal.fromEventTarget(canvas);
+		A.cancel(interaction);
 	});
 });
 
@@ -46,5 +46,6 @@ const modes = {
 };
 
 A.loop(async () => {
-	await modes[mode](canvasListener.on);
+	interaction = canvasListener.fork();
+	await modes[mode](interaction.on);
 });
