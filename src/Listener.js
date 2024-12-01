@@ -24,4 +24,12 @@ export class Listener {
 		});
 		this.signal = signal;
 	}
+	map(f) {
+		const listener = new Listener(null, this.signal.map(f));
+		listener.listen = () => {};
+		listener.on = (eventType) => {
+			return this.on(eventType).map(f);
+		};
+		return listener;
+	}
 }

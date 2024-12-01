@@ -1,4 +1,5 @@
 import * as assert from 'node:assert';
+import * as sinon from 'sinon';
 import * as A from '../src/ampel.js';
 
 const getValue = (s) => s.get();
@@ -103,6 +104,34 @@ describe('Ampel', () => {
 			foo: {text: 'Nevermore.'},
 			bar: {text: 'Nevermore.'},
 		});
+	});
+
+	it('Listener: .map()', () => {
+		const eventTarget = new EventTarget();
+		const original = new A.Listener(eventTarget);
+		const mapped1 = original.map(e => ({text: e.abc}));
+		const mapped2 = original.map(e => ({$: e.price}));
+		const spy1 = sinon.spy();
+		const spy2 = sinon.spy();
+		mapped1.on('cat').subscribe(spy1);
+		mapped2.on('car').subscribe(spy2);
+
+		let e;
+		e = new Event('cat');
+		e.abc = 'miaow';
+		eventTarget.dispatchEvent(e);
+
+		e = new Event('car');
+		e.price = 200_000;
+		eventTarget.dispatchEvent(e);
+
+		assert.deepStrictEqual(spy1.args, [
+			[{text: 'miaow'}],
+		]);
+		assert.deepStrictEqual(spy2.args, [
+			[{$: 200_000}],
+		]);
+
 	});
 
 });
