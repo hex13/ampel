@@ -1,10 +1,9 @@
 Ampel.js - library for signals 
 ===
-(this library is WIP and changes are not published to npm. Check out later for the npm release).
+this library is WIP - API can change and documentation can be not accurate. Changes may not be published to npm. Check out this project later if you find it interesting.
 
 building blocks:
 - Signal - represents single value changing in time. It can be used as reactive primitive (something similar to observable).
-- Listener - allows for listening event targets (e.g. DOM elements). It changes events into signals
 - ProxyState - wraps object and exposes the reactive proxy. Thus changes can be traced. 
 
 JS concepts Ampel.js supports:
@@ -22,8 +21,8 @@ You can await signals (which can be constructed from e.g. DOM events). This allo
 ```js
 import * as A from 'ampel';
 
-const whenFirst = A.Listener.fromEventTarget(document.getElementById('first')).on;
-const whenSecond = A.Listener.fromEventTarget(document.getElementById('second')).on;
+const whenFirst = A.Signal.fromEventTarget(document.getElementById('first')).on;
+const whenSecond = A.Signal.fromEventTarget(document.getElementById('second')).on;
 
 async function main() {
 	while (true) {
@@ -48,31 +47,13 @@ You can:
 - cancel signal via .cancel
 	cancelled signal can not worked be set. Additionally it would reject subscribers set via `.then` or `await` (so awaited signal would throw)
 
-Listener
+creating signals from DOM elements
 ===
-Listener allows for listening event targets (e.g. DOM elements). It changes events into signals.
-And it keeps and provides multiple signals (differentiated by string e.g. 'click'). These strings are changed into signals. And also customizable function `listen` is called (you can pass it in the constructor) which should subscribe to relevant event.
-
-example:
-```js
-
-async function main() {
-	const foo = new A.Listener((eventType, s) => {
-		document.getElementById('foo').addEventListener(eventType, (v) => {
-			s.set(v);
-		});
-	});
-	
-	await foo.on('click');
-}
-main();
-```
-~~It's usually not needed to manually create Listener like above because Listener has static method `fromEventTarget` which does exactly that (i.e. allows for listening to DOM elements or other objects that implement addEventListener method).~~
 
 example:
 ```js
 async function main() {
-	const foo = A.Listener.fromEventTarget(document.getElementById('foo'));
+	const foo = A.Signal.fromEventTarget(document.getElementById('foo'));
 	await foo.on('click');
 	alert('you clicked #foo');
 }
