@@ -4,6 +4,7 @@ export class Signal {
 	cancelled = false;
 	constructor(initial) {
 		this.value = initial;
+		this.root = this;
 	}
 	// virtual method that could be implemented for customization of method .on()
 	doListen() {
@@ -27,6 +28,7 @@ export class Signal {
 	}
 	transform(f) {
 		const s = new Signal();
+		s.root = this;
 		this.subscribe(v => {
 			f(s, v);
 		});
@@ -49,7 +51,7 @@ export class Signal {
 		});
 	}
 	on(type) {
-		this.doListen(type);
+		this.root.doListen(type);
 		return this.filter(v => v.type == type);
 	}
 	static fromEventTarget(eventTarget) {

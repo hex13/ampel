@@ -16,6 +16,7 @@ describe('Signal', () => {
 		const s = new A.Signal(123);
 		assert.strictEqual(getValue(s), 123);
 		assert.strictEqual(s.cancelled, false);
+		assert.strictEqual(s.root, s);
 	});
 	it('isSignal()', () => {
 		const s = new A.Signal();
@@ -79,6 +80,7 @@ describe('Signal', () => {
 
 		assert.ok(b instanceof Signal);
 		assert.notStrictEqual(b, a);
+		assert.strictEqual(b.root, a);
 
 		const values = [];
 		b.subscribe(v => {
@@ -96,6 +98,7 @@ describe('Signal', () => {
 
 		assert.ok(b instanceof Signal);
 		assert.notStrictEqual(b, a);
+		assert.strictEqual(b.root, a);
 
 		const values = [];
 		b.subscribe(v => {
@@ -113,6 +116,7 @@ describe('Signal', () => {
 
 		assert.ok(b instanceof Signal);
 		assert.notStrictEqual(b, a);
+		assert.strictEqual(b.root, a);
 
 		const values = [];
 		b.subscribe(v => {
@@ -167,6 +171,10 @@ describe('Signal', () => {
 
 	it('Signal: .on()', () => {
 		const s = new Signal();
+		const root = {
+			doListen: sinon.spy(),
+		};
+		s.root = root;
 		s.doListen = sinon.spy();
 		const onFoo = s.on('foo');
 		const onBar = s.on('bar');
@@ -187,7 +195,8 @@ describe('Signal', () => {
 		assert.deepStrictEqual(barSpy.args, [
 			[{type: 'bar', a: 3}],
 		]);
-		assert.deepStrictEqual(s.doListen.args, [
+		assert.deepStrictEqual(s.doListen.args.length, 0);
+		assert.deepStrictEqual(root.doListen.args, [
 			['foo'],
 			['bar'],
 		]);
