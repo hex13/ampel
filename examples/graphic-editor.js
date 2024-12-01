@@ -8,18 +8,17 @@ document.body.append(canvas);
 const ctx = canvas.getContext('2d');
 
 const canvasListener = A.Signal.fromEventTarget(canvas);
-let interaction;
 
 const getCoords = (e) => {
 	const bounds = e.target.getBoundingClientRect();
 	return {x: e.clientX - bounds.x, y: e.clientY - bounds.y};
 };
 
-let mode = 'pencil';
+const mode = new A.Signal('pencil');
+
 document.querySelectorAll('.mode').forEach(el => {
 	el.addEventListener('click', () => {
-		mode = el.dataset.mode;
-		A.cancel(interaction);
+		mode.set(el.dataset.mode);
 	});
 });
 
@@ -45,7 +44,12 @@ const modes = {
 	pencil, rectangle,
 };
 
+let interaction;
+mode.subscribe(m => {
+	interaction.cancel();
+});
+
 A.loop(async () => {
 	interaction = canvasListener.fork();
-	await modes[mode](interaction.on);
+	await modes[mode.get()](interaction.on);
 });
