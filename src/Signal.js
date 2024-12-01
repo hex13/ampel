@@ -5,6 +5,9 @@ export class Signal {
 	constructor(initial) {
 		this.value = initial;
 	}
+	// virtual method that could be implemented for customization of method .on()
+	doListen() {
+	}
 	get() {
 		return this.value;
 	}
@@ -44,6 +47,19 @@ export class Signal {
 		this.listeners.forEach(l => {
 			l.reject && l.reject(reason);
 		});
+	}
+	on(type) {
+		this.doListen(type);
+		return this.filter(v => v.type == type);
+	}
+	static fromEventTarget(eventTarget) {
+		const s = new Signal();
+		s.doListen = (type) => {
+			eventTarget.addEventListener(type, (e) => {
+				s.set(e);
+			});
+		};
+		return s;
 	}
 	static fromPromise(promise) {
 		const s = new Signal();

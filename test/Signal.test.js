@@ -1,7 +1,6 @@
 import * as assert from 'node:assert';
 import * as A from '../src/ampel.js';
 import * as sinon from 'sinon';
-
 const getValue = (s) => s.get();
 const setValue = (s, v) => s.set(v);
 
@@ -165,4 +164,59 @@ describe('Signal', () => {
 		assert.strictEqual(o.foo.cancelled, true);
 		assert.strictEqual(o.bar.cancelled, true);
 	});
+
+	it('Signal: .on()', () => {
+		const s = new Signal();
+		s.doListen = sinon.spy();
+		const onFoo = s.on('foo');
+		const onBar = s.on('bar');
+		const fooSpy = sinon.spy();
+		const barSpy = sinon.spy();
+		onFoo.subscribe(fooSpy)
+		onBar.subscribe(barSpy)
+		assert.ok(onFoo instanceof Signal);
+		assert.ok(onBar instanceof Signal);
+		s.set({type: 'foo', a: 1});
+		s.set({type: 'bar', a: 3})
+		s.set({type: 'foo', a: 2});
+
+		assert.deepStrictEqual(fooSpy.args, [
+			[{type: 'foo', a: 1}],
+			[{type: 'foo', a: 2}],
+		]);
+		assert.deepStrictEqual(barSpy.args, [
+			[{type: 'bar', a: 3}],
+		]);
+		assert.deepStrictEqual(s.doListen.args, [
+			['foo'],
+			['bar'],
+		]);
+	});
+
+	it('Signal.fromEventTarget()', () => {
+		const eventTarget = new EventTarget();
+		const s = Signal.fromEventTarget(eventTarget);
+		const onFoo = s.on('foo');
+		const onBar = s.on('bar');
+		const fooSpy = sinon.spy();
+		const barSpy = sinon.spy();
+		onFoo.subscribe(fooSpy)
+		onBar.subscribe(barSpy)
+
+		const e1 = new Event('foo');
+		eventTarget.dispatchEvent(e1);
+
+		const e2 = new Event('foo');
+		eventTarget.dispatchEvent(e2);
+
+		const e3 = new Event('bar');
+		eventTarget.dispatchEvent(e3);
+
+		assert.strictEqual(fooSpy.args.length, 2);
+		assert.strictEqual(fooSpy.args[0][0], e1);
+		assert.strictEqual(fooSpy.args[1][0], e2);
+		assert.strictEqual(barSpy.args.length, 1);
+		assert.strictEqual(barSpy.args[0][0], e3);
+	});
+
 });
