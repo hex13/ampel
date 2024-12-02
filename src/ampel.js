@@ -10,6 +10,10 @@ export function subscribe(signal, cb) {
 }
 
 
+export function listen(eventTarget) {
+	return Signal.fromEventTarget(eventTarget);
+}
+
 // TODO: move isSignal to Signal class as static method
 export function isSignal(thing) {
 	return !!thing?.isSignal;
