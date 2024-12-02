@@ -14,7 +14,7 @@ const getCoords = (e) => {
 	return {x: e.clientX - bounds.x, y: e.clientY - bounds.y};
 };
 
-const mode = new A.Signal('pencil');
+const mode = new A.Signal();
 
 document.querySelectorAll('.mode').forEach(el => {
 	el.addEventListener('click', () => {
@@ -46,10 +46,13 @@ const modes = {
 
 let interaction;
 mode.subscribe(m => {
-	interaction.cancel();
+	if (interaction) interaction.cancel();
+	interaction = canvasListener.fork();
+	A.run(async () => {
+		while (true) {
+			await modes[mode.get()](interaction.on);
+		}
+	});
 });
 
-A.loop(async () => {
-	interaction = canvasListener.fork();
-	await modes[mode.get()](interaction.on);
-});
+mode.set('pencil');

@@ -38,4 +38,14 @@ describe('Ampel', () => {
 			bar: {text: 'Nevermore.'},
 		});
 	});
+	it('run', async () => {
+		const ok = async () => {
+			return 123;
+		};
+		const throws = async () => {
+			throw 'some error';
+		};
+		assert.strictEqual(await A.run(ok), 123);
+		assert.strictEqual(await A.run(throws), 'some error');
+	});
 });

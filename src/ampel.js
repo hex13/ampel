@@ -31,6 +31,18 @@ export async function loop(f) {
 	}
 }
 
+export async function run(f) {
+	let res;
+	try {
+		res = await f();
+	} catch (e) {
+		// await delay(0); // to prevent freezing the browser
+		return e;
+	}
+	// await delay(0); // to prevent freezing the browser
+	return res;
+}
+
 export function cancel(signal, reason) {
 	if (signal.cancel) {
 		signal.cancel(reason);
